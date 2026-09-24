@@ -109,19 +109,29 @@ test("4. Same-time sequence update updates latest point without creating zero-du
   assert.equal(series?.lastSeq, 11);
 });
 
-test("4a. Same sequence can change stale status without a phantom sample", () => {
+test("4a. Stale intervals create a gap and recovery appends after it", () => {
   const buffer = createTelemetryBuffer(10);
-  const state = createMockState({ seq: 7, sim_time_utc: "2026-01-01T04:30:00Z" });
-  ingestSimState(buffer, state, false);
-  ingestSimState(buffer, state, true);
+  const first = createMockState({ seq: 6, sim_time_utc: "2026-01-01T04:30:00Z" });
+  const current = createMockState({ seq: 7, sim_time_utc: "2026-01-01T04:30:10Z" });
+  ingestSimState(buffer, first, false);
+  ingestSimState(buffer, current, false);
+  ingestSimState(buffer, current, true);
   let series = getScopeSeries(buffer, "office", "office");
-  assert.equal(series?.samples.length, 1);
-  assert.equal(series?.samples[0].status, "stale");
+  assert.equal(series?.samples.length, 2);
+  assert.equal(series?.samples[1].status, "stale");
+  assert.equal(series?.samples[1].power_w, null);
+  assert.equal(series?.samples[1].energy_kwh, null);
+  assert.equal(series?.hasGaps, true);
 
-  ingestSimState(buffer, state, false);
+  ingestSimState(buffer, current, false);
   series = getScopeSeries(buffer, "office", "office");
-  assert.equal(series?.samples.length, 1);
-  assert.equal(series?.samples[0].status, "running");
+  assert.equal(series?.samples.length, 3);
+  assert.equal(series?.samples[1].status, "stale");
+  assert.equal(series?.samples[2].status, "running");
+  assert.equal(series?.samples[2].power_w, current.office.power_w);
+  const svg = generateSvgPath(series.samples, "power", 500, 200, { top: 10, right: 10, bottom: 10, left: 10 });
+  assert.equal(svg.hasGaps, true);
+  assert.equal(svg.segments.length, 2);
 });
 
 test("4b. Every device retains bounded history when selection changes", () => {
@@ -177,6 +187,15 @@ test("4c. Missing unselected devices become null gaps and energy is not clamped"
 test("4d. Date context distinguishes days for long/high-speed windows", () => {
   assert.equal(formatKolkataDate("2026-01-01T18:30:00Z"), "2026-01-02");
   assert.equal(formatKolkataTimestamp("2026-01-01T18:30:00Z"), "2026-01-02 00:00:00");
+});
+
+test("4e. Energy bounds retain the maximum even when the latest value decreases", () => {
+  const bounds = calculateChartBounds([
+    { sim_time_utc: "2026-01-01T04:30:00Z", sim_time_ms: 1000, seq: 1, power_w: 0, energy_kwh: 10, status: "running" },
+    { sim_time_utc: "2026-01-01T04:30:10Z", sim_time_ms: 2000, seq: 2, power_w: 0, energy_kwh: 0, status: "running" },
+  ], "energy");
+  assert.equal(bounds.maxVal, 11.5);
+  assert.equal(bounds.currentVal, 0);
 });
 
 test("5. Null vs zero: missing readings remain null (gaps), never zero", () => {

@@ -102,7 +102,18 @@ export default function LiveCharts({
     targetName = selectedDevice.name;
   }
 
-  const activeSeries = getScopeSeries(buffer, effectiveScope, targetId);
+  // Do not expose the previous run's samples during the one commit before the
+  // effect has ingested the new run and cleared the buffer.
+  const activeSeries =
+    buffer.runId === (state?.run_id ?? null)
+      ? getScopeSeries(buffer, effectiveScope, targetId)
+      : null;
+  const emptyMessage =
+    buffer.runId !== (state?.run_id ?? null)
+      ? "Preparing the new run series..."
+      : effectiveScope !== "office" && !activeSeries
+        ? "Selected scope has no runtime sample yet."
+        : undefined;
 
   // Empty state when no run has started
   if (!state || state.status === "not_initialized" || !state.run_id) {
@@ -155,6 +166,7 @@ export default function LiveCharts({
           <div className="inline-flex rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900 text-xs">
             <button
               type="button"
+              aria-pressed={effectiveScope === "office"}
               onClick={() => setActiveScope("office")}
               className={`rounded-md px-3 py-1 font-medium transition-colors ${
                 activeScope === "office"
@@ -196,6 +208,7 @@ export default function LiveCharts({
           <div className="inline-flex rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900 text-xs">
             <button
               type="button"
+              aria-pressed={viewMode === "charts"}
               onClick={() => setViewMode("charts")}
               className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
                 viewMode === "charts"
@@ -207,6 +220,7 @@ export default function LiveCharts({
             </button>
             <button
               type="button"
+              aria-pressed={viewMode === "table"}
               onClick={() => setViewMode("table")}
               className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
                 viewMode === "table"
@@ -226,13 +240,17 @@ export default function LiveCharts({
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <PowerChart
               series={activeSeries}
+              scopeName={targetName}
               statusText={state.status}
               isStale={isStale}
+              emptyMessage={emptyMessage}
             />
             <EnergyChart
               series={activeSeries}
+              scopeName={targetName}
               statusText={state.status}
               isStale={isStale}
+              emptyMessage={emptyMessage}
             />
           </div>
         ) : (

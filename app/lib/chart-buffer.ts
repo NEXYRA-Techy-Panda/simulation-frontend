@@ -218,21 +218,52 @@ function appendScopeSample(
     buffer.series.set(key, series);
   }
 
-  // Same-time update: a newer sequence replaces the current point. An equal
-  // sequence is still allowed to change stale/fresh status, because a failed
-  // poll and its recovery can legitimately share the same processed instant.
+  // A stale poll is a graph gap, not a zero-valued telemetry point. Keep the
+  // last processed instant visible as stale, but remove its metric values so
+  // the SVG path breaks until a fresh sample arrives.
+  const point: ChartSample = sample.status === "stale"
+    ? { ...sample, power_w: null, energy_kwh: null }
+    : sample;
+
   if (sample.sim_time_utc === series.lastTimeUtc && series.samples.length > 0) {
+    if (sample.seq < series.lastSeq) return;
     const previous = series.samples[series.samples.length - 1];
-    if (
-      sample.seq > series.lastSeq
-      || (sample.seq === series.lastSeq && (sample.status === "stale" || previous.status === "stale"))
-    ) {
-      series.samples[series.samples.length - 1] = sample;
-      if (sample.seq > series.lastSeq) series.lastSeq = sample.seq;
-      series.latestPowerW = sample.power_w;
-      series.latestEnergyKwh = sample.energy_kwh;
-      recomputeExtrema(series);
+
+    if (sample.status === "stale") {
+      // Repeated stale polls do not create duplicate points; a newer stale
+      // sequence still replaces the current point's status.
+      if (previous.status !== "stale" || sample.seq > series.lastSeq) {
+        series.samples[series.samples.length - 1] = point;
+        series.lastSeq = sample.seq;
+        series.latestPowerW = point.power_w;
+        series.latestEnergyKwh = point.energy_kwh;
+        recomputeExtrema(series);
+      }
+      return;
     }
+
+    if (previous.status === "stale") {
+      // Recovery may carry the same sequence because the backend state did not
+      // advance while the connection recovered. Append after the explicit gap
+      // rather than replacing it and reconnecting the line across the outage.
+      if (sample.seq < series.lastSeq) return;
+      series.samples.push(point);
+      series.lastSeq = sample.seq;
+      series.latestPowerW = point.power_w;
+      series.latestEnergyKwh = point.energy_kwh;
+    } else if (sample.seq > series.lastSeq) {
+      series.samples[series.samples.length - 1] = point;
+      series.lastSeq = sample.seq;
+      series.latestPowerW = point.power_w;
+      series.latestEnergyKwh = point.energy_kwh;
+    } else {
+      return;
+    }
+
+    if (series.samples.length > buffer.maxSamples) {
+      series.samples.splice(0, series.samples.length - buffer.maxSamples);
+    }
+    recomputeExtrema(series);
     return;
   }
 
@@ -241,26 +272,12 @@ function appendScopeSample(
     return;
   }
 
-  // Paused simulation without time progress: update status of latest point instead of adding fake elapsed time
-  if (
-    sample.status === "paused" &&
-    sample.sim_time_utc === series.lastTimeUtc &&
-    series.samples.length > 0
-  ) {
-    series.samples[series.samples.length - 1].status = "paused";
-    return;
-  }
-
-  // Add new sample
-  series.samples.push(sample);
-  series.lastSeq = sample.seq;
-  series.lastTimeUtc = sample.sim_time_utc;
-  series.latestPowerW = sample.power_w;
-  series.latestEnergyKwh = sample.energy_kwh;
-
-  if (sample.power_w === null || sample.energy_kwh === null) {
-    series.hasGaps = true;
-  }
+  // Add a new sample. Stale points are normalized to null above.
+  series.samples.push(point);
+  series.lastSeq = point.seq;
+  series.lastTimeUtc = point.sim_time_utc;
+  series.latestPowerW = point.power_w;
+  series.latestEnergyKwh = point.energy_kwh;
 
   // Bounded buffer eviction
   if (series.samples.length > buffer.maxSamples) {

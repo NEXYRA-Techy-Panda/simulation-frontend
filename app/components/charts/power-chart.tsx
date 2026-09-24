@@ -15,8 +15,10 @@ import {
 
 export interface PowerChartProps {
   series: ScopeSeries | null;
+  scopeName?: string;
   statusText?: string;
   isStale?: boolean;
+  emptyMessage?: string;
   className?: string;
 }
 
@@ -30,8 +32,10 @@ export function formatPower(watts: number | null): string {
 
 export default function PowerChart({
   series,
+  scopeName,
   statusText,
   isStale = false,
+  emptyMessage = "Collecting live telemetry samples...",
   className = "",
 }: PowerChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -81,7 +85,7 @@ export default function PowerChart({
               Live Power Trend
             </h3>
             <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-400">
-              {series?.name ?? "No Scope"}
+              {scopeName ?? series?.name ?? "No Scope"}
             </span>
           </div>
           <p className="mt-0.5 text-xs text-zinc-400">
@@ -121,13 +125,14 @@ export default function PowerChart({
         {samples.length < 2 ? (
           <div className="flex h-[220px] flex-col items-center justify-center text-sm text-zinc-400">
             <div className="h-6 w-6 rounded-full border-2 border-cyan-500/30 border-t-cyan-400 animate-spin motion-reduce:animate-none" />
-            <span className="mt-2">Collecting live telemetry samples...</span>
+            <span className="mt-2">{emptyMessage}</span>
           </div>
         ) : (
           <svg
             viewBox={`0 0 ${width} ${height}`}
-            className="w-full h-auto overflow-visible select-none"
+            className="w-full h-auto overflow-visible select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
             aria-label="Live power trend graph"
+            tabIndex={0}
           >
             <defs>
               <linearGradient id="powerGlow" x1="0" y1="0" x2="0" y2="1">

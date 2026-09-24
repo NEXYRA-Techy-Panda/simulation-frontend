@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import {
+  calculateChartBounds,
   formatKolkataDate,
   formatKolkataTime,
   formatKolkataTimestamp,
@@ -14,8 +15,10 @@ import {
 
 export interface EnergyChartProps {
   series: ScopeSeries | null;
+  scopeName?: string;
   statusText?: string;
   isStale?: boolean;
+  emptyMessage?: string;
   className?: string;
 }
 
@@ -29,8 +32,10 @@ export function formatEnergy(kwh: number | null): string {
 
 export default function EnergyChart({
   series,
+  scopeName,
   statusText,
   isStale = false,
+  emptyMessage = "Collecting energy accumulation points...",
   className = "",
 }: EnergyChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -48,15 +53,14 @@ export default function EnergyChart({
   const height = 220;
   const padding = { top: 25, right: 30, bottom: 35, left: 60 };
 
-  const svgResult = generateSvgPath(samples, "energy", width, height, padding);
+  // Use the same retained-sample bounds as the SVG path. The latest value may
+  // legitimately decrease after a reset/command correction; the axis must still
+  // contain the full retained series rather than silently clipping it.
+  const energyBounds = calculateChartBounds(samples, "energy");
+  const svgResult = generateSvgPath(samples, "energy", width, height, padding, energyBounds);
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
-
-  // Max value scale
-  const maxEnergyDisplay =
-    latestEnergy !== null && latestEnergy > 0
-      ? Math.max(latestEnergy * 1.15, 0.05)
-      : 0.05;
+  const maxEnergyDisplay = energyBounds.maxVal;
 
   const yTicks = [0, 0.33, 0.66, 1.0];
 
@@ -78,7 +82,7 @@ export default function EnergyChart({
               Cumulative Energy
             </h3>
             <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-400">
-              {series?.name ?? "No Scope"}
+              {scopeName ?? series?.name ?? "No Scope"}
             </span>
           </div>
           <p className="mt-0.5 text-xs text-zinc-400">
@@ -118,13 +122,14 @@ export default function EnergyChart({
         {samples.length < 2 ? (
           <div className="flex h-[220px] flex-col items-center justify-center text-sm text-zinc-400">
             <div className="h-6 w-6 rounded-full border-2 border-amber-500/30 border-t-amber-400 animate-spin motion-reduce:animate-none" />
-            <span className="mt-2">Collecting energy accumulation points...</span>
+            <span className="mt-2">{emptyMessage}</span>
           </div>
         ) : (
           <svg
             viewBox={`0 0 ${width} ${height}`}
-            className="w-full h-auto overflow-visible select-none"
+            className="w-full h-auto overflow-visible select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
             aria-label="Cumulative energy trend graph"
+            tabIndex={0}
           >
             {/* Grid background */}
             <rect

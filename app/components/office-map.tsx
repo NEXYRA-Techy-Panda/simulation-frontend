@@ -5,7 +5,7 @@
 // dots, or export. Its real room/device selection is also exposed to the
 // mounted telemetry chart; device commands remain an explicit existing opt-in.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import {
   INVENTORY_TIMEOUT_MS,
@@ -61,6 +61,7 @@ export default function OfficeMap({
   const [lastSuccessIso, setLastSuccessIso] = useState<string | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const selectedRoomRef = useRef<string | null>(null);
   const inventoryRef = useRef<Inventory | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const mounted = useRef(true);
@@ -91,17 +92,18 @@ export default function OfficeMap({
         setLastSuccessIso(r.fetchedAtIso);
         setError(null);
         setPhase("loaded");
-        setSelectedRoomId((prev) =>
-          resolveSelection(
-            r.inventory.rooms.map((room) => room.room_id),
-            prev,
-          ),
+        const nextRoomId = resolveSelection(
+          r.inventory.rooms.map((room) => room.room_id),
+          selectedRoomRef.current,
         );
-        setSelectedDeviceId((prev) =>
-          prev && r.inventory.devices.some((device) => device.device_id === prev)
-            ? prev
-            : null,
-        );
+        selectedRoomRef.current = nextRoomId;
+        setSelectedRoomId(nextRoomId);
+        setSelectedDeviceId((prev) => {
+          const device = prev
+            ? r.inventory.devices.find((candidate) => candidate.device_id === prev)
+            : null;
+          return device && device.room_id === nextRoomId ? prev : null;
+        });
       } else {
         // Keep previous data visible but labelled stale; fresh error otherwise.
         setError(r.error);
@@ -131,10 +133,13 @@ export default function OfficeMap({
   const selectedDevices = selectedRoom
     ? (grouped?.byRoom.get(selectedRoom.room_id) ?? [])
     : [];
-  const selectedDevice = useMemo(
-    () => inventory?.devices.find((device) => device.device_id === selectedDeviceId) ?? null,
-    [inventory, selectedDeviceId],
+  const selectedDeviceCandidate = inventory?.devices.find(
+    (candidate) => candidate.device_id === selectedDeviceId,
   );
+  const selectedDevice =
+    selectedDeviceCandidate && selectedDeviceCandidate.room_id === selectedRoom?.room_id
+      ? selectedDeviceCandidate
+      : null;
 
   useEffect(() => {
     onSelectionChange?.({
@@ -153,6 +158,7 @@ export default function OfficeMap({
   const hours = inventory ? officeHoursSummary(inventory) : null;
 
   const selectRoom = (roomId: string) => {
+    selectedRoomRef.current = roomId;
     setSelectedRoomId(roomId);
     setSelectedDeviceId(null);
   };

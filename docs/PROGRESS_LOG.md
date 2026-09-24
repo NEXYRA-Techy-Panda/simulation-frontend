@@ -386,3 +386,33 @@ correction entry; do not rewrite history.
 - Likely K003 overlap: `package.json` test script (keep both test files), `app/components/sim-live.tsx`, `app/components/office-map.tsx`, `app/lib/sim-state.ts`, and the three shared continuity docs.
 - Review status: pending (no self-assigned approval). Commit reference: the K004-PREP3 commit on `kishore/k004-environment-ui`, recorded in the return report after the local commit (branch not pushed).
 - Next action: wait for external review of both environment branches; after K003 lands, integrate onto the then-current `main` (keeping both test files), apply the three-step mounting change in the K004-PREP3 evidence section 11, re-run test/typecheck/lint/build, then complete the outstanding browser and end-to-end checks. Do not merge, push or deploy before review.
+---
+
+## 2026-09-25 — K004-FAST1 (frontend) opened and handed over untouched (actual, Agent K-B — GLM-5.3)
+
+- Layer ID: K004-FAST1 (Days-mode controls + hourly recording UI), Agent
+  K-B — GLM-5.3, developer Kishore Kumar. The owner stopped the task at a
+  safe checkpoint and transferred ownership to **Mohan M-C — Claude Code**
+  before any frontend implementation began.
+- Worktree/branch: `../simulation-frontend-k004`, branch `kishore/k004-fast1-ui`
+  created this session from `kishore/k004-environment-ui` (`cbafa41`, the
+  K004-PREP3 commit; ultimate base `dbcbee9b` == committed `main` at that
+  inspection). **Zero source changes were made in this worktree for K004-FAST1**;
+  the tree is identical to `cbafa41` except for the continuity doc additions
+  committed by this entry.
+- Planned but NOT started (successor's list): `app/lib/days-advance.ts` typed
+  adapter (existing `sanitizeOrigin`, bounded timeouts, honest failure states,
+  no frontend clock/energy math, public `/sim` prefix preserved, no new env
+  vars) and a reusable unmounted `DaysAdvanceControls` component following the
+  K004-PREP3 pattern (`useSyncExternalStore` controller, parent-authoritative
+  props), 1/7/30/custom (max 31) day presets, the "about 1 simulated day per
+  second — target, depends on processing speed" copy, processed-time progress
+  from `GET /state`'s additive `advance` field, and focused `node:test`
+  checks. Backend counterpart: `kishore/k004-fast1` (worktree
+  `../simulation-backend-k004`), checkpoint commit `23b1141`, routes still
+  pending there.
+- No processes started; no ports touched; nothing merged, pushed or deployed.
+- Next action (Mohan M-C — Claude Code): implement the adapter + component per
+  the backend continuation plan in
+  `../simulation-backend-k004/docs/K004_FAST1_EVIDENCE.md` §6, keeping main
+  working copies and other agents' worktrees untouched.

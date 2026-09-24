@@ -248,6 +248,22 @@ correction entry; do not rewrite history.
 
 ## 2026-09-24 19:35:00 +05:30 (IST) — F2-A completed (actual, Agent A)
 
+---
+
+## 2026-09-24 19:42:37 +05:30 (IST) — P001 F4-A started (actual, Agent A — OpenCode)
+
+- F2-A completed and accepted based on supplied evidence. Dated correction:
+  contract 1.0.1 (F1-R2) is accepted; "unaccepted"/"review pending" wording
+  about the contract in older entries refers to pre-acceptance review state.
+  History preserved, not rewritten.
+- Exclusive owner of the two frontends; Claude Code owns simulation-backend,
+  Codex owns auditor-backend for its assignment — no writes/installs/commits/
+  processes there, no shared-parent or contract changes.
+- Startup: AGENTS.md absent; context + API.md + manifest read; `main` clean
+  at 6e94fb8, fetch clean.
+- Next action: implement lib/health.ts + connection-panel, wire into page.
+- Review status: pending. P001 commit: none yet.
+
 - Next 16.3.6 + React 19.2.8 + TS 5.9.3 + Tailwind 4.3.3 foundation on port
   3000 ("Office Simulator"). typecheck/lint(0 errors)/build/verifier
   75/75/HTTP-200 green; no browser inspection available.
@@ -255,3 +271,12 @@ correction entry; do not rewrite history.
   Backend repos untouched. Review pending; no approval claimed.
 - Next action: commit, push `main`, verify remote hash; return F2-A evidence.
 - Commit references: F1-R2 pushed; F2-A recorded after push.
+
+---
+
+## 2026-09-24 19:55:00 +05:30 (IST) - P001 F4-A completed (actual, Agent A - OpenCode)
+
+- Connection panel implemented (kind="simulator"); 20/20 logic+mock checks; 75/75 contract; typecheck/lint(0 errors)/build green; HTTP-200 panel markup; servers stopped.
+- Real backend :4000 refused (integration pending); browser/CORS not verifiable in-session. Backend repos untouched. Review pending; no approval claimed.
+- Next action: commit, push main, verify remote hash; return P001 evidence. Stop after P001.
+- Commit references: F2-A pushed; P001 recorded after push.

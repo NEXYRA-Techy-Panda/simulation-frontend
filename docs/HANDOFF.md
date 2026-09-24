@@ -1,5 +1,21 @@
 # HANDOFF — simulation-frontend
 
+## SIM-VIS-01 visual takeover checkpoint (2026-09-25; in progress)
+
+- M-D — FreeBuff's session ended with source/assets/tests uncommitted in the
+  expected registered worktree `../simulation-frontend-visual`, branch
+  `mohan/sim-visual-01`, initially at `dbcbee9`. Work is preserved and
+  attribution retained. Main worktree was separate and clean at the same SHA.
+- The saved implementation includes the top-down five-room office, SVG crew
+  and equipment art, status/clocks, room selection/inspector, fixture scenarios
+  and pure tests. These are observed files, not yet fully verified or accepted.
+- Current takeover/evidence: [SIM_VIS_01_EVIDENCE.md](SIM_VIS_01_EVIDENCE.md).
+  No task-owned process was running at inspection. Browser screenshots,
+  verification, bug fixes, local commit and bundle remain pending.
+- Chart branch `kishore/sim-chart-01` at `9fc0f79f3082929cd67c475bc4b1902543632090`
+  was absent locally and was not merged. K-A owns main integration; this branch
+  remains isolated with no push or deployment.
+
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
 - Current layer: **K002 / K1 — contract checkout portability and run-policy
@@ -307,3 +323,9 @@ record actual commands and results (no invention), update sections 2–3/7–11,
 and leave prior history intelligible. Keep sections 1/12/14 intact unless
 ownership or scope is formally revised. Return the updated sections as handoff
 evidence.
+
+## SIM-VIS-01 closeout update (2026-09-25)
+
+- Visual implementation and code checks completed on isolated branch `mohan/sim-visual-01`; however, the 375px screenshot still shows preview header/control overflow. Status is partial; review pending. 52/52 tests, typecheck, lint (0 errors; 1 pre-existing warning), build and diff check pass. See `SIM_VIS_01_EVIDENCE.md`.
+- No production backend, database runtime, or API command path was tested; built `/preview` returns 404. No main merge, push or deployment.
+- Exact next action: M-B fixes the documented 375px preview overflow and refreshes the screenshot; after lint/build, K-A reviews and integrates the branch in the simulator main worktree and coordinates the separate chart branch independently. Transfer bundle path and verification are in the evidence doc.

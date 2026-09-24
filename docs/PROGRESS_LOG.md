@@ -366,3 +366,16 @@ correction entry; do not rewrite history.
 - Review status: pending (no self-assigned approval). Commit references: simulation-frontend `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed, local == origin/main); the K002 `.gitattributes` is in `e227839`.
 - Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
 - Next action: complete the manual browser checklist against a local backend run and record the results; the backend policy-timing correction is the next recommended K-layer. Do not start simulator features until assigned.
+## 2026-09-25 — SIM-VIS-01 interrupted-session takeover checkpoint
+
+- Assignment M-B took over the unfinished M-D — FreeBuff simulator visual work. The expected worktree `K:\NEXYRA\simulation-frontend-visual` and branch `mohan/sim-visual-01` exist. Initial HEAD `dbcbee9b935a3f6777f7a8bfca097d258e02e652` equals separate `main` worktree and `origin/main`; all FreeBuff visual work was uncommitted, preserved, and unaltered at takeover.
+- Observed saved files: `office-floor-plan.tsx`, `office-map-panel.tsx`, `room-inspector.tsx`, `status-strip.tsx`, `technical-panel.tsx`, SVG illustrations, `equipment.ts`, `floor-plan.ts`, `occupancy.ts`, fixture-only `app/preview`, new pure tests, and style/layout replacements. Old `office-map.tsx` is deleted in the worktree. No checkpoint/evidence file existed before takeover; `docs/SIM_VIS_01_EVIDENCE.md` now records observed baseline and limits.
+- No `AGENTS.md` was found within the repository file inventory. No task-owned preview or browser process was present. Edge/Chrome binaries are available for local fixture-only browser capture. Chart branch `kishore/sim-chart-01` and its reported commit were not present in the local branch listing.
+- No reset, clean, stash, sibling edit, dependency install, backend access, API call, main merge, or push was performed. Work remains in progress; tests and browser capture have not yet been run.
+- Next action: review/fix accessibility and visual state behavior, run typecheck/lint/tests/build, then inspect isolated `/preview` screenshots without contacting any backend.
+
+## SIM-VIS-01 verification update (2026-09-25)
+
+- Completed code review and verification in `K:\NEXYRA\simulation-frontend-visual`, branch `mohan/sim-visual-01`. Recoverable changes stayed intact; demonstrated preview, fixture, accessibility and clock hydration defects were corrected. The final 375px capture still shows header/control overflow, so visual completion is partial. Full commands and screenshots: `docs/SIM_VIS_01_EVIDENCE.md`.
+- Checks: 52/52 tests, typecheck, lint (0 errors; one pre-existing verifier warning), production build, and `git diff --check` pass. Local fixture preview returned 200; built production preview returned 404. Desktop and 375px mock screenshots saved. No backend/database/API runtime check, main merge, deployment, or push.
+- Local commit and complete-history Git bundle are created and verified. Review remains pending. Next action: M-B fixes the 375px overflow and refreshes its screenshot; then K-A reviews/integrates the branch in main and coordinates the separate chart branch independently.

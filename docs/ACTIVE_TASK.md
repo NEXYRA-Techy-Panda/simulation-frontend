@@ -1,5 +1,18 @@
 # ACTIVE_TASK — simulation-frontend
 
+## SIM-VIS-01 takeover checkpoint (2026-09-25)
+
+- Owner: Mohan | Agent M-B — Codex. The interrupted M-D — FreeBuff session
+  ended; its uncommitted work is preserved on `mohan/sim-visual-01` at the
+  existing main baseline. This agent now owns only the isolated visual branch.
+- Original visual implementation is in progress, not yet accepted: review,
+  typecheck/lint/tests/build, local mock screenshot review, defects, final commit
+  and transfer bundle remain. No browser was launched, no commands were sent
+  to a backend, and no screenshots are claimed yet.
+- Exact recovered state and limits: [SIM-VIS-01 evidence](SIM_VIS_01_EVIDENCE.md).
+- K-A retains main integration; K-C's chart branch was not available locally.
+  No sibling worktree, backend, deployment or main branch was changed.
+
 ## prompt_id
 
 K002 — K1 (contract checkout portability and run-policy timing).
@@ -141,3 +154,9 @@ in its `docs/K002_POLICY_TIMING_EVIDENCE.md`. Mohan owns `auditor-frontend`,
 Base: `e227839`. K002 documentation:
 `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed to `main`). A short
 follow-up documentation commit records this hash.
+
+## SIM-VIS-01 closeout status (2026-09-25)
+
+- Visual work and checks are complete on `mohan/sim-visual-01`, but the 375px capture still shows preview header/control overflow; status is partial and review pending. Final gates: tests 52/52, typecheck pass, lint 0 errors (1 pre-existing warning), build pass, whitespace check pass. See `docs/SIM_VIS_01_EVIDENCE.md`.
+- Production build's `/preview` route returns 404. No database runtime, backend command path, production API, deployment or integration was exercised. No push or merge was performed.
+- Next action: fix the preview badge/control overflow shown in `docs/sim-vis-01/empty-mobile.png`, refresh that capture, and rerun lint/build. Then K-A can review and integrate this branch in the simulator main worktree, coordinating the separate chart work independently. Current commit and bundle details are in the evidence document.

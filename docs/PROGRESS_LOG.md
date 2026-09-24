@@ -349,4 +349,20 @@ correction entry; do not rewrite history.
 - Open defect (backend, recorded not fixed): run-policy timing - see the backend K001 evidence; a new run can apply policy versions whose `effective_from_utc` is later than its own intervals.
 - Files changed: created `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. No app source or contract change; `.next/` remains git-ignored.
 - Review status: pending (no self-assigned approval). Commit references: the K001 commit recorded in the K001 return report after push.
+
+---
+
+## 2026-09-24 23:23:00 +05:30 (IST) - K002 / K1 completed (actual, Agent K - Kishore's coding agent)
+
+- Layer ID: K002 - K1 (contract checkout portability and run-policy timing). Owner: Kishore Kumar. In THIS repository only checkout configuration (`.gitattributes`) and documentation changed: no app source, config, dependency, lockfile or contract change; no animations or new features.
+- Startup: `main` clean at `e227839` (K001 `.gitattributes` commit) == `origin/main`; fetch clean; no remote advancement; write access works, so K001 was already published.
+- Diagnosis confirmed on the actual files: Git stores canonical LF blobs; `core.autocrlf=true` comes from the **system** config (`file:C:/Program Files/Git/etc/gitconfig`) and there was no `.gitattributes`; the verifier hashes raw bytes (`scripts/verify-contract.mjs:41`).
+- Fix: added `.gitattributes` with exactly two rules - `contracts/v1/** text eol=lf` and `scripts/verify-contract.mjs text eol=lf` - merged with any existing attributes (none), then restored only those confirmed-unmodified paths from their exact Git blobs (no broad reset/clean, nothing lost). No global Git configuration change; ordinary source/docs files deliberately left to default handling; contract semantics, manifest and every hash check untouched (no verifier byte normalisation, no manifest regeneration).
+- Result: **0 CR bytes** across the 9 hashed paths; `verify:contract` **75 passed / 0 failed** (was 67/75). A **fresh temporary clone** that inherits `core.autocrlf=true` also checked out 0 CR bytes and passed **75/75**. No UI rebuild was needed because no UI code changed.
+- Recommendation recorded (not actioned here): Mohan's three mirrors (`auditor-frontend`, `auditor-backend`, `energy-ml-service`) need the same two rules since they mirror `scripts/verify-contract.mjs` and `contracts/v1/**`; those repos were not touched.
+- Backend half of K002 (run-scoped policy activation; migration `003_run_policy_activation`; 61/61 tests; real-HTTP reproduction) is recorded in `../simulation-backend/docs/K002_POLICY_TIMING_EVIDENCE.md`. No frontend runtime behaviour changed.
+- Browser verification: still NOT performed (no browser ability in session) - the K001 manual checklist in `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md` S10 remains the outstanding item.
+- Files changed: created `.gitattributes`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. `.next/` remains git-ignored.
+- Review status: pending (no self-assigned approval). Commit references: the K002 commit recorded in the K002 return report after push.
+- Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
 - Next action: complete the manual browser checklist against a local backend run and record the results; the backend policy-timing correction is the next recommended K-layer. Do not start simulator features until assigned.

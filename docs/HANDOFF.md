@@ -2,14 +2,15 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **K001 / K0 — setup and onboarding** (Agent K — Kishore's
-  coding agent) — status **completed**, review **pending**. Kishore's laptop
-  workspace, handoff and baseline were verified; no app source, config,
-  dependency or lockfile was changed. Contract: **1.0.1 authoritative,
-  read-only**. Note for Windows clones with `core.autocrlf=true`: the contract
-  verifier reports **67/75** — the 8 failures are manifest byte-hash
-  line-ending mismatches, not semantic failures (K001 addendum below and
-  [K001 evidence §8](K001_KISHORE_ONBOARDING_EVIDENCE.md)).
+- Current layer: **K002 / K1 — contract checkout portability and run-policy
+  timing** (Agent K — Kishore's coding agent) — status **completed**, review
+  **pending**. In this repository only checkout configuration (`.gitattributes`)
+  and documentation changed; no app source, config, dependency, lockfile or
+  contract file was modified. Contract: **1.0.1 authoritative, read-only**. The
+  K001 line-ending mismatch is **fixed**: `contracts/v1/**` and
+  `scripts/verify-contract.mjs` now check out with LF, so `verify:contract`
+  reports **75/75** here and in a fresh clone that inherits
+  `core.autocrlf=true` (K002 addendum below).
 - K001 addendum (2026-09-24, Agent K — Kishore's coding agent, setup/onboarding
   only, review **pending**; prompted as P018, renamed K001 before it ran — no
   P018 record existed, so no history was rewritten): reused the existing clone
@@ -35,6 +36,25 @@
   inlined into client chunks. Browser verification not performed (no browser
   in session) — manual checklist in
   [K001_KISHORE_ONBOARDING_EVIDENCE.md](K001_KISHORE_ONBOARDING_EVIDENCE.md).
+  No process left running; ports free.
+- K002 addendum (2026-09-24, Agent K — Kishore's coding agent, checkout
+  configuration + documentation only, review **pending**): added `.gitattributes`
+  with exactly two rules — `contracts/v1/** text eol=lf` and
+  `scripts/verify-contract.mjs text eol=lf` — merged with (there were none to
+  overwrite) and applied to exactly the hashed paths. `core.autocrlf=true` comes
+  from the **system** Git config (`file:C:/Program Files/Git/etc/gitconfig`) and
+  the verifier hashes raw bytes, so a Windows checkout used to convert these
+  files to CRLF; the confirmed-unmodified paths were then restored from their
+  exact Git blobs (targeted, no broad reset/clean). Result: **0 CR bytes** across
+  the 9 hashed paths, `verify:contract` **75 passed / 0 failed**, and a fresh
+  temporary clone inheriting `core.autocrlf=true` also checked out 0 CR bytes
+  and passed **75/75**. No global Git configuration was changed, no contract
+  semantics/manifest/hash check was touched, and ordinary source/documentation
+  files were deliberately left alone. The same two rules are recommended for
+  Mohan's three mirrors (`auditor-frontend`, `auditor-backend`,
+  `energy-ml-service`) — not modified here. Backend-side K002 work (run-scoped
+  policy activation) is recorded in the sibling repository's
+  `docs/K002_POLICY_TIMING_EVIDENCE.md`; no frontend runtime behaviour changed.
   No process left running; ports free.
 - P005 S10-A addendum (completed, review pending): office-map screen —
   inventory loading/error/loaded/empty states + manual refresh, top-down SVG

@@ -11,8 +11,9 @@ and auditing project.
   `https://git-pipeline.metatronhost.in/sim`.
 - **Current state (SIM-INTEGRATION, 2026-09-25)**: authoritative simulator UI,
   historical JSON/CSV export controls, and bounded live power/energy charts;
-  review pending. The chart uses the existing polling stream and real map
-  selection, while export coverage remains persisted and `/sim`-anchored.
+  published and read-only deployment checks complete, review pending. The chart
+  uses the existing polling stream and real map selection, while export coverage
+  remains persisted and `/sim`-anchored.
 
 Docs:
 

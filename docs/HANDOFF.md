@@ -18,9 +18,10 @@
 - Two safe integration corrections were made: inventory refresh no longer
   recreates its own effect/request loop, and the initial forced state poll is
   deferred 50 ms for the effect/StrictMode cycle. No second polling loop exists.
-- Final combined gates/publication remain pending. No public deployment or
-  production simulator mutation is claimed. K003 sections below are preserved
-  historical continuity.
+- Final combined gates passed and normal publication completed: backend remote
+  `5cb824d`, frontend remote `bacc8ff`. Read-only public health/runs/export and
+  deployed frontend chart/375px checks succeeded; no public mutation was made.
+  K003 sections below are preserved historical continuity.
 
 ## K003 historical addendum (2026-09-25, Kishore | K-A — OpenCode)
 

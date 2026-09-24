@@ -6,9 +6,10 @@
 - **Chart source:** `9fc0f79f3082929cd67c475bc4b1902543632090`
   (`kishore/sim-chart-01`, based on `dbcbee9`)
 - **K003 preserved commit:** `c4b319d`
-- **Status:** local integration verification complete; final combined gates and
-  publication pending
-- **Deployment:** not claimed; the public deployment was not mutated
+- **Status:** completed; local integration, publication, and read-only observed
+  deployment checks complete
+- **Deployment:** backend/frontend routes observed after push; no public
+  mutation was performed
 
 ## Integration boundary
 
@@ -119,10 +120,38 @@ panel remained present and the existing headless download limitation is
 unchanged (response bytes were received, but Save As persistence is not
 claimed).
 
+## Publication and observed deployment
+
+Publication was performed normally after the green gates:
+
+```text
+simulation-backend origin/main: 5cb824dc581495a9d1ea9db114cac6823f2e7c1a
+simulation-frontend origin/main: bacc8ff6419db360d9da481048cbe1e482301daf
+```
+
+Read-only public observations after publication:
+
+- `https://git-pipeline.metatronhost.in/sim/api/v1/health` returned HTTP 200.
+- `GET /sim/api/v1/runs?page=1&page_size=1` returned the active run with
+  committed coverage and `exportable: true`.
+- A one-minute public JSON export returned HTTP 200, `Content-Disposition`
+  attachment, `Cache-Control: no-store`, and an allowed origin for
+  `https://enersave-simulator.vercel.app`.
+- `https://enersave-simulator.vercel.app/` rendered the current frontend with
+  live office state and the mounted chart section. The observed paused state
+  showed `312 W` and `128.2084666665512 kWh`; device scope was visibly disabled
+  until map selection.
+- The observed deployed frontend had no horizontal overflow at 1280px or true
+  375px CDP width, and no mobile button exceeded the viewport.
+
+These were GET/HEAD-style read-only checks. No public lifecycle, device, reset,
+or database mutation was sent. The chart deployment is therefore observed, but
+interactive deployed device-switch/download persistence remains distinct from
+the local integration verification above.
+
 ## Not claimed
 
-No claim is made for public deployment, public CORS/download behavior, real
-production telemetry, keyboard traversal, offline recovery, or a future
+No claim is made for public keyboard traversal, offline recovery, or a future
 SIM-VIS-01 illustrated-map redesign. The chart is mounted below the current map
 and can be relocated when that separate design branch is ready. K004 and
 unrelated feature work remain out of scope.

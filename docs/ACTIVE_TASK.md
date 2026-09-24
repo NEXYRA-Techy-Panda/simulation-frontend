@@ -14,9 +14,9 @@ Kishore | K-A — OpenCode.
 
 ## status
 
-completed locally — K003 is preserved in commit `c4b319d`; chart branch
-`9fc0f79` is integrated, current-build telemetry/selection verification is
-recorded, and only final staged review plus normal publication remain.
+completed — K003 is preserved in commit `c4b319d`; chart branch `9fc0f79`
+is integrated, current-build telemetry/selection verification is recorded, and
+publication/read-only deployment checks are complete.
 
 Review status: pending (never self-approved).
 
@@ -89,6 +89,6 @@ feature work.
 
 ## exact next action
 
-Inspect the final staged merge, commit normally, push the frontend and backend
-K003/integration commits, verify both remote hashes, and report publication
-versus observed deployment separately. Do not start K004.
+Final state is published and observed: backend remote `5cb824d`, frontend
+remote `bacc8ff`; public backend health/runs/export and the deployed frontend
+chart/375px layout were read-only checked. Do not start K004.

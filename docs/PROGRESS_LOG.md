@@ -453,3 +453,18 @@ correction entry; do not rewrite history.
   commit/push remain. No public deployment or production mutation is claimed.
 - Evidence: `docs/SIM_INTEGRATION_EVIDENCE.md` and the current-build temporary
   screenshots under the approved temp directory. Do not start K004.
+
+---
+
+## 2026-09-25 03:45:00 +05:30 (IST) — SIM-INTEGRATION publication observed (Kishore | K-A — OpenCode)
+
+- Pushed normally: backend `origin/main=5cb824dc581495a9d1ea9db114cac6823f2e7c1a`;
+  frontend `origin/main=bacc8ff6419db360d9da481048cbe1e482301daf`.
+- Read-only public checks: backend health 200; runs catalog returned committed
+  exportable coverage; one-minute JSON export returned attachment disposition,
+  no-store, and allowed `enersave-simulator.vercel.app` origin. The deployed
+  frontend rendered live chart state (`312 W`, `128.2084666665512 kWh`) and had
+  no overflow at desktop or true 375px.
+- No public lifecycle/device/reset/database mutation was sent. Interactive
+  deployed persistence and unrelated accessibility/recovery claims remain
+  distinct from local verification. K004 remains out of scope.

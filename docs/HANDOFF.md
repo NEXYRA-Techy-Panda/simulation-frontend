@@ -2,10 +2,10 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **F1** (shared contract v1.0.0) — status
-  **blocked** (contract authored + verified; commit/push await git identity),
-  review **pending**. Contract: **1.0.0 defined** (canonical
-  `simulation-backend/contracts/v1/`, mirrored to siblings).
+- Current layer: **F1-R2** (contract v1.0.1 corrections) — status
+  **completed**, review **pending**. Contract: **1.0.1 defined** (canonical
+  `simulation-backend/contracts/v1/`, mirrored to siblings; replaces the
+  unaccepted 1.0.0 prototype, no backward compatibility claimed).
 - Continuity files: [ACTIVE_TASK.md](ACTIVE_TASK.md) (current task, checkpoint,
   exact next action) and [PROGRESS_LOG.md](PROGRESS_LOG.md) (append-only history;
   F0 entry reconstructed, F0.1 entry actual).
@@ -54,6 +54,12 @@
   7 W × 44,640-interval budget check. Verifier extended: CSV-alone
   reconstruction + full semantic parity, 4 negative checks. 54/54 in all five
   repos. Repo-local identity configured. History preserved in PROGRESS_LOG.
+- F1-R2 addendum (2026-09-24, completed, review pending): version 1.0.1
+  (replaces unaccepted 1.0.0 prototype). This repo holds the corrected mirror:
+  9dp power precision + fractional checks, V/I average semantics,
+  kind-specific closed policy rules, persist-until-cleared overrides, concrete
+  Python A/B requests with bounds, full API paths + scaffold health states.
+  75/75 in all five repos; CSV-alone parity unchanged. History preserved.
 
 ## 1. Purpose and owner
 

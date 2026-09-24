@@ -170,3 +170,30 @@ correction entry; do not rewrite history.
 - Next action: commit, push `main`, verify remote hash; return F1-R1 evidence.
   Do not begin F2.
 - Commit references: F1 pushed; F1-R1 recorded after push.
+
+---
+
+## 2026-09-24 19:01:33 +05:30 (IST) — F1-R2 started (actual)
+
+- Layer ID: F1-R2. F1-R1 completed; architecture review changes_requested
+  after direct inspection of simulation-backend@3000b9d (verifier 54/54
+  independently confirmed; CSV correction accepted). No approval, no F2.
+- Objective: 9dp power precision + fractional checks; V/I semantics;
+  kind-specific policy rules; persist-until-cleared overrides; concrete Python
+  requests; full API paths + health states; version 1.0.1. Canonical edits in
+  simulation-backend, then mirrors.
+- Startup: no AGENTS.md; all repos clean on `main` at F1-R1 commits; fetch
+  clean; repo-local identity present.
+- Next action: author corrections in `simulation-backend/contracts/v1/`.
+- Review status: pending.
+
+---
+
+## 2026-09-24 19:07:48 +05:30 (IST) — F1-R2 completed (actual)
+
+- Corrected 1.0.1 mirror received and verified 75/75 (all five repos).
+- Continuity updated: ACTIVE_TASK completed, HANDOFF F1-R2 addendum,
+  F1_EVIDENCE F1-R2 section. Review pending; no approval claimed.
+- Next action: commit, push `main`, verify remote hash; return F1-R2 evidence.
+  Do not begin F2.
+- Commit references: F1-R1 pushed; F1-R2 recorded after push.

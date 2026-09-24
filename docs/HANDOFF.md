@@ -2,9 +2,56 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **K002 / K1 — contract checkout portability and run-policy
-  timing** (Agent K — Kishore's coding agent) — status **completed**, review
-  **pending**. In this repository only checkout configuration (`.gitattributes`)
+- **K004-PREP3 addendum (2026-09-25, Agent K-B — FreeBuff, frontend environment
+  controls *preparation* only, review **pending**; not merged, not pushed, not
+  deployed).** Isolated worktree `simulation-frontend-k004`, branch
+  `kishore/k004-environment-ui`, base
+  `dbcbee9b935a3f6777f7a8bfca097d258e02e652` (== committed `main` ==
+  `origin/main`; no rebase, merge, cherry-pick or base update). Created
+  `app/lib/environment.ts` (typed adapter for `POST /api/v1/environment` plus an
+  explicit controller state machine), `app/components/environment-controls.tsx`
+  (reusable, **deliberately unmounted**) and
+  `app/lib/__tests__/environment-controls.test.mjs` (25 checks); the only other
+  change is the `package.json` test script. No dependency, config, contract,
+  page, map, export control or live-state coordinator was touched, because K-A —
+  OpenCode owns those files for K003 in the main working copy (its uncommitted
+  K003 files were not copied here and none of those paths were edited). Bounds
+  −30…60 °C / 0…100 % reject blank, non-finite and out-of-range input **without
+  clamping** (zero is valid); capability, run identity, confirmed climate and
+  freshness are parent props, and a missing/unknown AC power model means
+  unsupported — never assumed. Protections: legacy run explained and never
+  reset, duplicate submissions refused, abort on unmount, bounded 15 s timeout,
+  late responses dropped across room/run changes including A → B → A, entered
+  values kept on failure, no automatic retry, timeout reported as uncertain with
+  refresh-before-retry, parent authoritative refresh after confirmed success, and
+  no browser-computed power/energy/readings and no invented seq or timestamp.
+  Verified on the final tree (preview removed): `npm test` **44/44**, typecheck
+  exit 0, `lint` **0 errors / 1 pre-existing warning** (`verify-contract.mjs:188`,
+  present on the base commit), `npm run build` exit 0 (`/` and `/_not-found`
+  static), plus a temporary mocked SSR preview served over `next start -p 3123`
+  (HTTP 200, three capability states, no contact with the public simulator) that
+  was deleted before commit and whose process/port were released. Six initial
+  `react-hooks` lint errors were fixed by making the controller an external
+  store (cached immutable snapshot, `subscribe`, `configure`) consumed through
+  `useSyncExternalStore`. Backend dependency: `simulation-backend` branch
+  `kishore/k004-environment-prep` (`13d59b6`), preserved and unmerged. **Browser
+  interaction and end-to-end integration were NOT performed** (no browser in
+  session; mocked checks are not real backend integration); mounting the
+  component, merging and any deployment remain pending, and feature-branch
+  deployment behaviour stays unconfirmed. Details and the exact three-step
+  mounting change: [K004_ENVIRONMENT_UI_PREP_EVIDENCE.md](K004_ENVIRONMENT_UI_PREP_EVIDENCE.md).
+- Dated correction (2026-09-25, K004-PREP3): the "current layer" bullet below
+  (K002/K1, 2026-09-24) is **superseded**. Kishore's current line of work is the
+  K004 environment preparation on isolated branches — K004-PREP (`43aa9fa`) and
+  K004-PREP2 (`13d59b6`) in `simulation-backend-k004`, and K004-PREP3 on
+  `kishore/k004-environment-ui` — none merged, pushed or deployed. The main
+  `simulation-frontend` working copy holds K-A's **uncommitted K003** historical
+  export work (`sim-live.tsx`, `package.json`, new export files) on top of
+  `dbcbee9`. History preserved, not rewritten.
+- Current layer (superseded by the correction above; kept for history):
+  **K002 / K1 — contract checkout portability and run-policy timing** (Agent K —
+  Kishore's coding agent) — status **completed**, review **pending**. In this
+  repository only checkout configuration (`.gitattributes`)
   and documentation changed; no app source, config, dependency, lockfile or
   contract file was modified. Contract: **1.0.1 authoritative, read-only**. The
   K001 line-ending mismatch is **fixed**: `contracts/v1/**` and

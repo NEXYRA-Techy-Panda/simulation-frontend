@@ -2,16 +2,15 @@
 
 ## Layer ID
 
-F1-R2
+F2-A
 
 ## Objective
 
-Targeted corrections from direct architecture review (lead inspected
-simulation-backend@3000b9d; verifier 54/54 independently confirmed; CSV
-correction accepted; overall F1 still changes_requested). Mirror role: 9dp
-power precision, V/I semantics, kind-specific policy rules, persist-until-
-cleared overrides, concrete Python requests, full API paths + health states,
-version 1.0.1. No F2, no scaffolding, no installs, no deployment.
+Next.js + React + TypeScript + Tailwind foundation for the Simulator UI
+("Office Simulator", port 3000): scaffold, foundation screen (engine not
+connected), .env.example, npm scripts (dev/build/start/lint/typecheck/
+verify:contract), install + verify + typecheck + lint + build + serve + HTTP
+check, commit + push. No backend integration, no features.
 
 ## Task status
 
@@ -24,58 +23,62 @@ pending
 ## Repository and owner
 
 - Repository: `simulation-frontend` (`https://github.com/NEXYRA-Techy-Panda/simulation-frontend.git`)
+- Agent: Agent A (exclusive owner of the two frontends this layer).
 - Foundation owner (F0–F6): Mohan. Long-term owner: Kishore Kumar (after F6 handoff).
 
 ## Current branch
 
-`main` (F1-R1 `17c6350` pushed; tree clean; repo-local identity set)
+`main` (F1-R2 `81eba0b` pushed; tree clean at F2-A start)
 
 ## Last checkpoint timestamp, including timezone
 
-2026-09-24 19:07:48 +05:30 (IST) — F1-R2 completed.
-architecture review: changes_requested (direct inspection). No AGENTS.md;
-trees clean; fetch clean.
+2026-09-24 19:35:00 +05:30 (IST) — F2-A completed (simulator UI).
 
 ## Applicable contract version
 
-1.0.1 (being authored; replaces unaccepted 1.0.0 prototype; no backward
-compatibility claimed).
+1.0.1 (read-only during F2-A; no version/fixture/schema/manifest changes).
 
 ## Completed steps
 
-1. Startup: context read; git state inspected (clean, in sync); F1-R2
-   recorded here, review pending.
-2. Repo-local identity already configured (mohan-madhu/mohan326856@gmail.com).
+1. Startup: context read; git state clean/in-sync at expected commit;
+   F2-A recorded; contract read-only noted.
+2. Environment: Node v24.21.0, npm 11.19.0; registry reachable.
+3. Scaffolded (temp dir), copied app/configs in, wrote foundation screen,
+   package scripts, .env.example, merged .gitignore/README.
+4. Installed; verifier 75/75; typecheck clean; lint 0 errors; build clean;
+   served production on 3000 and HTTP-verified (200 + title + status text);
+   stopped own server process. No browser capability.
 
 ## Files changed
 
-- Updated: `docs/ACTIVE_TASK.md` (this file).
+- Created: `app/`, `public/`, configs, `package.json`+lock, `.env.example`,
+  `docs/F2_A_EVIDENCE.md`. Updated: `README.md`, `.gitignore`, `docs/HANDOFF.md`,
+  `docs/PROGRESS_LOG.md`, `docs/ACTIVE_TASK.md`.
 
 ## Verification performed and actual results
 
-- Branch `main`, clean tree, F1-R1 commit `17c6350`, origin in sync.
+- `git status` clean, `main` at `81eba0b`, fetch clean. No AGENTS.md.
+- Node 24 satisfies Next 16 (requires >=20.9) — compatible, no runtime change.
 
 ## Incomplete edits and uncommitted changes
 
-- None incomplete. All corrections authored, mirrored, verified; continuity
-  docs updated. Committing and pushing now.
+- None incomplete. Backend repos untouched. Committing and pushing now.
 
 ## Blockers or unknowns
 
-- None currently. Push auth to be confirmed at push time.
+- None. Backend repos owned by another agent — do not touch.
 
 ## Exact next action
 
-Corrections are authored in `simulation-backend/contracts/v1/` (canonical),
-then mirrored here and verified 75/75. Committing, pushing `main`, verifying
-remote hash; then return F1-R2 evidence. Do not begin F2.
+Commit, push `main`, verify remote hash; then return F2-A evidence.
+Do not proceed to F3 or F4.
 
 ## Related-repository dependencies
 
-Canonical corrections in `../simulation-backend`. Siblings: 4000/3001/4001/
-8000. This repo's port: 3000.
+Paired backend `../simulation-backend` (port 4000) — other agent's work;
+no integration in F2-A. Contract canonical copy lives there (read-only).
 
 ## Commit reference
 
-F1-R1: `17c6350fd9403839a4e3a38fbdef92e9b80a3275` (pushed, verified).
-F1-R2: none yet.
+F1-R2: `81eba0bbd94e89364fd09696ba7e7fa68ad577e6` (pushed, verified).
+F2-A: none yet.

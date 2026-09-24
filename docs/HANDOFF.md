@@ -2,10 +2,14 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **F1-R2** (contract v1.0.1 corrections) — status
-  **completed**, review **pending**. Contract: **1.0.1 defined** (canonical
-  `simulation-backend/contracts/v1/`, mirrored to siblings; replaces the
-  unaccepted 1.0.0 prototype, no backward compatibility claimed).
+- Current layer: **F2-A** (frontend foundation, Agent A) — status
+  **completed**, review **pending**. Contract: **1.0.1 (read-only this layer)**.
+- F2-A addendum (2026-09-24, completed, review pending): independently runnable
+  Next.js 16.3.6 + React 19.2.8 + TS 5.9.3 + Tailwind 4.3.3 app on port 3000
+  ("Office Simulator"; engine-not-connected foundation screen; no fake
+  controls, probes, or sockets). typecheck/lint(0 errors)/build/75-75
+  verifier/HTTP-200 all green; browser inspection not available. `package-lock`
+  committed. Details in [F2_A_EVIDENCE.md](F2_A_EVIDENCE.md). History preserved.
 - Continuity files: [ACTIVE_TASK.md](ACTIVE_TASK.md) (current task, checkpoint,
   exact next action) and [PROGRESS_LOG.md](PROGRESS_LOG.md) (append-only history;
   F0 entry reconstructed, F0.1 entry actual).

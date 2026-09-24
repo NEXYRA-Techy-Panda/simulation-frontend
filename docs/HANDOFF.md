@@ -1,6 +1,26 @@
 # HANDOFF — simulation-frontend
 
-## 0. Continuity and current layer (F0.1, 2026-09-24)
+## K003 current addendum (2026-09-25, Kishore | K-A — OpenCode)
+
+- Historical run/window/format/resolution selection and one-request JSON/CSV
+  download are implemented, review pending. Coverage comes from persisted run
+  metadata; the browser performs no telemetry/export calculations.
+- The fixed public `https://git-pipeline.metatronhost.in/sim` prefix is
+  preserved and directly tested; no Vercel env requirement was reintroduced.
+- True CDP 375x812 and 1280x800 current-build checks show zero horizontal
+  overflow and no out-of-viewport buttons. K-C's original headless screenshot
+  used a 504px inner viewport cropped to 375px; this measurement limitation and
+  the responsive correction are recorded in K003 evidence.
+- An isolated local-backend browser flow rendered one run/36 committed rows,
+  returned 28,804 export bytes and displayed "JSON download started" with no
+  error. Headless disk persistence canceled, so Save As remains pending.
+- Gates: 28/28 tests, typecheck/build/contract green, lint zero errors plus one
+  pre-existing verifier warning. No production mutation/deployment occurred.
+  Evidence: [K003_EXPORT_UI_EVIDENCE.md](K003_EXPORT_UI_EVIDENCE.md). Exact next
+  action is final docs/diff/staged review, normal frontend commit/push and remote
+  hash verification; stop after K003. Historical sections below are preserved.
+
+## 0. Historical continuity (F0.1, 2026-09-24)
 
 - Current layer: **K002 / K1 — contract checkout portability and run-policy
   timing** (Agent K — Kishore's coding agent) — status **completed**, review

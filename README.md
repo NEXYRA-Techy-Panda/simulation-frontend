@@ -9,8 +9,10 @@ and auditing project.
 - **Owner**: Mohan (foundation F0–F6) → Kishore Kumar (after handoff).
 - **Frontend port**: `3000`. Public backend:
   `https://git-pipeline.metatronhost.in/sim`.
-- **State at F0 (2026-09-24)**: empty repository — documentation only, no code.
-  See `docs/HANDOFF.md` for verified state.
+- **Current state (K003, 2026-09-25)**: authoritative simulator UI plus
+  historical JSON/CSV export controls; review pending. The panel uses persisted
+  run coverage and the fixed public `/sim` API base. Responsive 375px and desktop
+  layouts have direct current-build evidence.
 
 Docs:
 
@@ -24,6 +26,7 @@ Docs:
 - [Data contract v1](contracts/v1/CONTRACT.md)
 - [Service interfaces](contracts/v1/API.md)
 - [F2-A evidence](docs/F2_A_EVIDENCE.md)
+- [K003 export UI evidence](docs/K003_EXPORT_UI_EVIDENCE.md)
 
 ## Developer setup (F2-A foundation)
 
@@ -39,6 +42,15 @@ npm run verify:contract  # dependency-free contract checks (75/75)
 npm run build        # production build
 npm run start        # serve production on http://localhost:3000
 ```
+
+## Historical export
+
+The live UI reads `GET /api/v1/runs`, shows committed persisted coverage, and
+downloads backend-generated JSON or standalone CSV for 1/5/10/15/30/60-minute
+aggregation. It does not calculate telemetry or use live simulated time as
+coverage. Equivalent file downloads share a backend export identity. Full
+wiring, numerical tests and browser evidence are in
+[`docs/K003_EXPORT_UI_EVIDENCE.md`](docs/K003_EXPORT_UI_EVIDENCE.md).
 
 Deployment configuration is fixed in
 [`app/lib/deployment-config.ts`](app/lib/deployment-config.ts). The public API

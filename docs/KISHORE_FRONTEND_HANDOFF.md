@@ -1,5 +1,16 @@
 # Simulator frontend handoff — Kishore Kumar (Agent A — OpenCode, P011)
 
+## K003 update (2026-09-25, Kishore | K-A — OpenCode)
+
+K002 and the deployment/reset fixes remain intact. K003 adds run/window/format/
+resolution selection and backend JSON/CSV download, keeps `/sim`, and corrects
+true 375px overflow while preserving desktop layout/focus. Gates: 28/28 tests,
+typecheck/build/contract green, lint has one pre-existing verifier warning.
+Headless browser initiated and received the export response; disk persistence
+and the K-C untested interactions remain honestly pending. See
+`K003_EXPORT_UI_EVIDENCE.md`. Historical P009/P011 statements below are
+preserved but superseded where they mention export as missing or old env/ports.
+
 This document hands further simulator-frontend feature development to
 **Kishore Kumar**. Mohan's agents are moving to foundations and auditor/ML
 work. It describes the actual working baseline at P009 commit
@@ -63,20 +74,15 @@ npm run build           # production build
 npm run start           # serve production on http://localhost:3000
 ```
 
-Environment: copy `.env.example` to `.env` (real `.env` stays ignored).
-`NEXT_PUBLIC_SIMULATION_BACKEND_URL=http://localhost:4000` holds the backend
-**origin only**; code appends full contract paths (`/api/v1/health`,
-`/api/v1/state`, `/api/v1/inventory`, …). Required backend routes:
-`GET /api/v1/health`, `GET /api/v1/inventory`, `GET /api/v1/state`,
-`POST /api/v1/control/{start,pause,resume,reset,speed}`,
-`POST /api/v1/devices/:id`.
+Deployment configuration is committed in
+`app/lib/deployment-config.ts`; the fixed base is
+`https://git-pipeline.metatronhost.in/sim`. Vercel environment variables are
+not required. Required backend routes now also include
+`GET /api/v1/runs` and `GET /api/v1/export`.
 
-Localhost points to the current device: Kishore cannot reach Mohan's machine
-through `localhost`. For local development, run the simulator pair
-(frontend + backend) on Kishore's laptop with the backend on port 4000.
-Shared remote integration will use the planned hosted URLs later — set the
-env var to the hosted origin then; no code changes needed. No deployment in
-this assignment.
+For isolated browser work, do not edit the committed base: use a task-owned
+application copy or a browser request rewrite to a scratch backend on the fixed
+listener `127.0.0.1:19001`. Never point lifecycle automation at production.
 
 ## 4. Code map (actual file paths)
 
@@ -89,6 +95,10 @@ this assignment.
 - `app/components/clocks.tsx` — analogue SVG + digital from one instant.
 - `app/components/lifecycle-controls.tsx` — status/speed/buttons + errors.
 - `app/components/connection-panel.tsx` — backend reachability panel.
+- `app/components/historical-export.tsx` — K003 run/window/format/resolution
+  controls, honest committed coverage, one-request download states.
+- `app/lib/historical-export.ts` — strict run catalog, UTC window, exact `/sim`
+  request and file-response adapter.
 - `app/lib/sim-state.ts` — state/command types, strict parsers, exact P004
   bodies, `shouldApplyUpdate`, `backoffForFailures`, `createSingleFlight`,
   `describeInstant`, timeouts (state 8 s, commands 15 s).
@@ -96,7 +106,8 @@ this assignment.
 - `app/lib/office-map.ts` — fixed room geometry, power labels (group total
   never multiplied), hours summary, selection resolution.
 - `app/lib/health.ts` — health fetch/parse shared with the panel.
-- `app/lib/__tests__/sim-state.test.mjs` — 18 committed node:test checks.
+- `app/lib/__tests__/sim-state.test.mjs` — 19 committed state/command checks.
+- `app/lib/__tests__/historical-export.test.mjs` — 9 K003 adapter checks.
 - `scripts/verify-contract.mjs` — 75 contract checks, unchanged since F1.
 
 Polling state lives in `sim-live.tsx` (`tracked` run/seq ref, `failCount`,
@@ -122,14 +133,15 @@ fetched payloads.
 
 ## 6. Outstanding verification (pending unless evidence says otherwise)
 
-- Real browser fetch/CORS against a running backend.
-- Clock display and the Asia/Kolkata date rollover (2025-12-31T18:30:00Z →
-  01 Jan 2026) in a real browser.
-- Start/pause/resume/reset/speed against a scratch backend run (never
-  another agent's active run).
-- Lighting set/clear and subsequent authoritative readings.
+- Real deployed browser fetch/CORS and downloadable disk persistence; the local
+  isolated export response was initiated/received, but headless Save As canceled.
+- Clock display and Asia/Kolkata rollover with a live advancing backend.
+- Start/pause/resume/reset/speed against a scratch run without exposing those
+  mutations to production.
+- Interactive room selection, lighting set/clear, and authoritative refresh.
 - Network failure, stale controls, and recovery presentation.
-- Keyboard controls and narrow-screen layout.
+- Full keyboard traversal. Current responsive screenshots prove layout and focus
+  styling only; they do not prove tab order/activation.
 
 ## 7. Remaining work for Kishore (ordered by backend readiness)
 
@@ -139,7 +151,8 @@ fetched payloads.
 3. Broader device controls beyond lighting+switch, when the backend
    supports them; environment controls likewise.
 4. Socket.IO live state + snapshot/history recovery (replaces polling).
-5. History generation/export UI against backend history endpoints.
+5. Batch history-generation UI when backend `/history/jobs` exists; K003 export UI
+   for existing committed runs is implemented.
 6. Fault controls and original/improved scenario comparison integration.
 7. Among Us-style doodle occupants remain a later (MVP3) feature — not now.
 

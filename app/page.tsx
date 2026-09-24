@@ -7,17 +7,17 @@ const backendUrl = SIMULATION_BACKEND_URL;
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 font-sans dark:bg-black">
-      <header className="border-b border-zinc-200 bg-white px-8 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+      <header className="min-w-0 border-b border-zinc-200 bg-white px-4 py-4 sm:px-8 dark:border-zinc-800 dark:bg-zinc-950">
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           Office Simulator
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="break-words text-sm text-zinc-500 dark:text-zinc-400">
           NEXYRA simulation frontend — office map and inventory
         </p>
       </header>
-      <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <main className="mx-auto grid min-w-0 w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <SimLive backendUrl={backendUrl} />
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <ConnectionPanel backendUrl={backendUrl} kind="simulator" />
           <section className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
             <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">

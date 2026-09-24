@@ -365,4 +365,26 @@ correction entry; do not rewrite history.
 - Files changed: created `.gitattributes`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. `.next/` remains git-ignored.
 - Review status: pending (no self-assigned approval). Commit references: simulation-frontend `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed, local == origin/main); the K002 `.gitattributes` is in `e227839`.
 - Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
-- Next action: complete the manual browser checklist against a local backend run and record the results; the backend policy-timing correction is the next recommended K-layer. Do not start simulator features until assigned.
+
+---
+
+## 2026-09-25 02:41:16 +05:30 (IST) — K003 export UI + responsive QA checkpoint (Kishore | K-A — OpenCode)
+
+- Resumed clean deployment/current HEAD `dbcbee9`; preserved K002 and the later
+  control-ack/reset-race fix. No prior K003 implementation existed.
+- Added strict run catalog, committed half-open coverage, UTC window, format and
+  six-resolution controls; one bounded raw-file download with visible errors,
+  no-data/stale states and duplicate-submit protection. `/sim` is preserved.
+- Added K-C's responsive correction. Investigation found K-C's `--window-size=375`
+  capture had a 504px inner viewport cropped to 375px. Current build was then
+  verified with true CDP 375x812 and 1280x800: scroll/client widths equal,
+  horizontal overflow false, zero out-of-viewport buttons; desktop preserved.
+- Isolated browser export: one run/36 committed rows, enabled Download JSON,
+  28,804 response bytes received, success-started status, no UI error. Headless
+  download canceled before disk persistence, so Save As is not claimed.
+- Gates: **28/28** tests, typecheck/build/contract 75/75 green; lint 0 errors and
+  one pre-existing verifier warning. No production lifecycle mutation, database,
+  environment, deployment-config or deployment change. Local :3100/:19001
+  processes stopped and ports clear. Evidence: `K003_EXPORT_UI_EVIDENCE.md`.
+- Review pending. Exact next action: final docs/diff/staged review, all gates,
+  normal commit/push and remote hash verification. Stop after K003; no K004.

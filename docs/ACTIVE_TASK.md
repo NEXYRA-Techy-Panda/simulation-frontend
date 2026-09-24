@@ -2,142 +2,88 @@
 
 ## prompt_id
 
-K002 — K1 (contract checkout portability and run-policy timing).
-Prompt: Agent K — Kishore's coding agent. Owner: Kishore Kumar.
+K003 — historical export UI plus confirmed responsive QA correction (resumed
+under Kishore | K-A — OpenCode).
 
-## agent
+## agent / owner
 
-K — Kishore's coding agent (Kishore Kumar's ownership)
+- Developer: Kishore Kumar
+- Agent: K-A — OpenCode
+- Previous owner label: Agent K (Kishore's coding agent)
+- Exclusive scope: `simulation-frontend` only for this task.
 
-## Layer ID
+## status
 
-K1 — contract checkout portability (frontend side is configuration + docs only)
+in_progress — export UI, responsive correction, and browser/mock verification
+complete; continuity, final diff review, commit and push remain.
 
-## Objective
+Review status: pending (never self-approved).
 
-In **this** repository K002 does exactly two things: restore portable contract
-verification by pinning LF checkout for the hashed paths, and record it in
-documentation. **No** application source, config, dependency, lockfile, contract
-semantics, animation or new simulator feature was changed. Contract 1.0.1
-authoritative, read-only.
+## baseline and previous outcome
 
-The run-policy timing half of K002 is backend work and lives in the sibling
-repository (`simulation-backend/docs/K002_POLICY_TIMING_EVIDENCE.md`).
+- Resumed clean `main` at `dbcbee9b935a3f6777f7a8bfca097d258e02e652`,
+  which includes deployment baseline `b31ac37` plus the reset/control-ack fix.
+- K002 remains complete, review pending. No K003 source/evidence or unfinished
+  edits existed before this assignment.
+- K-C's `qa-evidence/K003-QA2` mobile report was read. Its 375px screenshot was
+  captured with headless Chrome's minimum 504px window cropped to 375px; source
+  was nevertheless hardened and independently verified with true 375px CDP
+  device metrics.
 
-## Task status
+## implemented checkpoint
 
-completed (checkout portability + documentation)
+- Added `HistoricalExportPanel` after the office map.
+- Added a strict paginated run catalog adapter for `GET /api/v1/runs`, including
+  committed coverage, exportability, no-data, cross-page duplicate checks, and
+  current-run selection without a null-to-run duplicate request.
+- Added run, UTC half-open window, JSON/CSV, and six aggregation-resolution
+  controls. Defaults come from persisted committed coverage, never live time.
+- One bounded fetch downloads unmodified backend bytes through a per-download
+  object URL; errors remain on-page, duplicate submits are blocked, refresh and
+  selection cannot race an active download, and success says "download started"
+  rather than claiming disk completion.
+- The committed `/sim` deployment base is preserved exactly. No Vercel env var
+  or telemetry/export calculation was added.
+- Corrected narrow layout: true 375px viewport has no horizontal overflow; all
+  lifecycle buttons, Reset, and Refresh inventory remain visible. Desktop keeps
+  the original inline layout. A consistent visible focus ring was added.
+- K-C's untested claims (interactive room selection, live clocks, keyboard
+  traversal, offline/stale recovery) remain explicitly unclaimed.
 
-## Review status
+## verification checkpoint — actual
 
-pending (never self-assigned)
+- `npm test`: 28/28 passed (19 existing + 9 K003 adapter checks).
+- `npm run typecheck`: passed.
+- `npm run lint`: zero errors; one pre-existing warning in the untouched
+  contract verifier (`scripts/verify-contract.mjs:188`).
+- `npm run build`: passed; `/` and `/_not-found` static.
+- `npm run verify:contract`: 75/75.
+- True 375x812 CDP viewport: client/scroll width `375/375`, horizontal overflow
+  false, no button outside viewport; Reset and Refresh inventory measured within
+  bounds.
+- 1280x800 CDP viewport: client/scroll width `1280/1280`, overflow false, no
+  button outside viewport; desktop control geometry preserved.
+- Isolated local-backend browser flow: one run and 36 committed rows displayed;
+  Download JSON returned 28,804 bytes and the UI reported "JSON download
+  started" with no error. Headless Chrome received all bytes but canceled its
+  download before writing a file; disk persistence remains unverified.
+- No lifecycle mutation was sent. Local frontend :3100 and backend :19001 were
+  task-owned and are stopped; ports were verified clear.
 
-## Previous task outcome (preserved)
+## files changed so far
 
-- **K001 (K0 — setup and onboarding): completed, review pending.** Workspace,
-  handoff and baseline were verified; no app source/config/dependency change.
-  Evidence: `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md`; commit `f2cdffe`
-  published.
-- **P011 (Kishore frontend handoff): completed, review pending.** P009 and P005
-  remain implemented and accepted for implementation based on supplied evidence,
-  with live backend/browser verification still outstanding. Recorded in
-  `docs/PROGRESS_LOG.md`.
-- The K001-discovered contract-verifier mismatch (67/75 from CRLF conversion) is
-  the K002 work below.
+- `app/lib/historical-export.ts`
+- `app/components/historical-export.tsx`
+- `app/lib/__tests__/historical-export.test.mjs`
+- `app/components/{sim-live,lifecycle-controls,office-map,clocks,connection-panel}.tsx`
+- `app/page.tsx`, `app/globals.css`, `package.json`
+- K003 evidence and continuity/README documentation (in progress)
 
-## Repository and owner
+No dependency, lockfile, contract, deployment-config, environment, production
+database, or deployment setting was changed.
 
-- Repository: `simulation-frontend`
-  (`https://github.com/NEXYRA-Techy-Panda/simulation-frontend.git`)
-- Agent: K — Kishore's coding agent.
-- Owner: Kishore Kumar. Paired backend: `../simulation-backend` (port 4000).
+## exact next action
 
-## Current branch
-
-`main`, clean. HEAD at the start of K002:
-`e2278399ceb0a1680b4c847bb30432ea9bc18c66` (the K001 `.gitattributes` commit),
-equal to `origin/main`. `git fetch` was clean; no remote advancement.
-
-## Last checkpoint timestamp, including timezone
-
-2026-09-24 23:23:00 +05:30 (IST) — K002 checkout fix verified; documentation
-written; committing.
-
-## Applicable contract version
-
-1.0.1 (mirrored, read-only). `contracts/v1/**`, its schema/fixtures and
-`scripts/verify-contract.mjs` **content** were not edited — only their checkout
-attributes.
-
-## Environment (this laptop)
-
-Windows 11 build 26200, Git Bash; git `2.55.0.windows.4`, node `v24.19.0`,
-npm `11.17.0`. `core.autocrlf=true` comes from the **system** Git config
-(`file:C:/Program Files/Git/etc/gitconfig`); no global Git configuration was
-changed. Note the paired backend needs Node >= 24 for `node:sqlite`.
-
-## Completed steps
-
-1. Confirmed the K001 diagnosis on the actual files: Git stores canonical LF
-   blobs, `core.autocrlf=true` (system config, no `.gitattributes`) converted the
-   hashed paths to CRLF, and `scripts/verify-contract.mjs` hashes raw bytes.
-2. Added `.gitattributes` with exactly two rules — `contracts/v1/** text eol=lf`
-   and `scripts/verify-contract.mjs text eol=lf` — merged with any existing
-   attributes (there were none). Deliberately left ordinary source/documentation
-   files untouched and made no global Git change.
-3. Restored only the affected, confirmed-unmodified paths from their exact Git
-   blobs (targeted; no broad `reset`/`clean`/discard; nothing of the user's was
-   lost).
-4. Verified: **0 CR bytes** across the 9 hashed paths, `verify:contract`
-   **75 passed / 0 failed**, and a **fresh temporary clone** that inherits
-   `core.autocrlf=true` also checked out 0 CR bytes and passed **75/75**. Shared
-   schema/fixtures/version are unchanged and no hash check was weakened.
-5. Recorded the same two-rule recommendation for Mohan's three mirrors
-   (`auditor-frontend`, `auditor-backend`, `energy-ml-service`) without
-   modifying them.
-
-## Files changed
-
-- Created: `.gitattributes` (this repository's K002 configuration change).
-- Updated: `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md` (this file),
-  `docs/PROGRESS_LOG.md`.
-- Unchanged: all `app/**` source, configs, `package.json`, `package-lock.json`,
-  `contracts/**` (content), `scripts/**` (content), `.next/`.
-
-## Verification performed and actual results
-
-`verify:contract` **75/75** (was 67/75) in this repository and in a fresh clone
-with `core.autocrlf=true` inherited from the system config; 0 CR bytes across the
-hashed paths. No UI rebuild was required, because no UI code changed.
-
-## Incomplete edits and uncommitted changes
-
-None in source. The K002 documentation and `.gitattributes` are committed by
-this task. No sibling repository, contract file or parent file was touched.
-
-## Blockers or unknowns
-
-- Browser-side verification (clocks/rollover, selection, keyboard, lifecycle
-  against the real backend, stale presentation, narrow layout) is still open —
-  K002 had no browser ability either.
-- The backend's export endpoint is not implemented, so end-to-end export/import
-  integration is still pending.
-
-## Exact next action
-
-Complete the manual browser checklist in the K001 evidence §10 against a local
-backend run and record the results; the backend's next assigned layer is the
-historical export endpoint built on run-scoped policy activation. Do not begin
-new simulator features until assigned.
-
-## Related-repository dependencies
-
-Paired backend `../simulation-backend` (port 4000); K002 backend work is recorded
-in its `docs/K002_POLICY_TIMING_EVIDENCE.md`. Mohan owns `auditor-frontend`,
-`auditor-backend` and `energy-ml-service`; none were touched.
-
-## Commit reference
-
-Base: `e227839`. K002 documentation:
-`906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed to `main`). A short
-follow-up documentation commit records this hash.
+Finalize K003 evidence/handoff/continuity, rerun all gates after the final diff,
+inspect staged files, commit and push only frontend K003 files, then verify the
+remote hash. Do not begin K004.

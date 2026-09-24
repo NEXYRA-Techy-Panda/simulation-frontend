@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Clocks from "./clocks";
+import HistoricalExportPanel from "./historical-export";
 import LifecycleControls, { type PendingOp } from "./lifecycle-controls";
 import OfficeMap from "./office-map";
 import {
@@ -276,7 +277,7 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-w-0 flex-col gap-6">
       <Clocks simTimeUtc={sim?.sim_time_utc ?? null} />
 
       <LifecycleControls
@@ -294,7 +295,7 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
 
       <section
         aria-label="Office live readings"
-        className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
+        className="min-w-0 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
@@ -362,6 +363,11 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         mutateDisabled={mutateDisabled}
         devicePendingId={devicePendingId}
         onDeviceCommand={handleDeviceCommand}
+      />
+
+      <HistoricalExportPanel
+        backendUrl={backendUrl}
+        currentRunId={sim?.run_id ?? null}
       />
     </div>
   );

@@ -25,6 +25,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Keep keyboard focus visible on every interactive control, including the
+   responsive export form. Native controls retain their semantics; this only
+   adds a consistent high-contrast ring. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
 /* SVG room regions: keyboard-focusable, visible focus ring. */
 .office-room {
   cursor: pointer;

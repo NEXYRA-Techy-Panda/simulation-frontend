@@ -23,10 +23,28 @@ import {
   resolveSelection,
 } from "../lib/office-map";
 import { sanitizeOrigin } from "../lib/health";
+import type { DeviceState, RoomState } from "../lib/sim-state";
+
+export interface LiveData {
+  devices: Map<string, DeviceState>;
+  rooms: Map<string, RoomState>;
+}
 
 type Phase = "loading" | "loaded" | "error";
 
-export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
+export default function OfficeMap({
+  backendUrl,
+  live = null,
+  mutateDisabled = false,
+  devicePendingId = null,
+  onDeviceCommand = null,
+}: {
+  backendUrl: string;
+  live?: LiveData | null;
+  mutateDisabled?: boolean;
+  devicePendingId?: string | null;
+  onDeviceCommand?: ((deviceId: string, control: "on" | "off" | "clear") => void) | null;
+}) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -268,6 +286,16 @@ export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
                 Capacity: {selectedRoom.capacity} people (capacity, not current
                 occupancy)
               </p>
+              {live?.rooms.get(selectedRoom.room_id) ? (
+                <p className="mt-1 font-mono text-xs text-zinc-700 dark:text-zinc-300">
+                  Current occupancy:{" "}
+                  {live.rooms.get(selectedRoom.room_id)?.occupancy} (backend)
+                </p>
+              ) : (
+                <p className="mt-1 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                  Current occupancy: not available yet
+                </p>
+              )}
               {hours && (
                 <p className="mt-1 font-mono text-xs text-zinc-500 dark:text-zinc-400">
                   Building hours: {hours}
@@ -287,6 +315,12 @@ export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
                     const grace = policy
                       ? graceSeconds(policy.rules)
                       : null;
+                    const runtime = live?.devices.get(device.device_id) ?? null;
+                    const controllable =
+                      device.device_type === "lighting" &&
+                      (device.controls ?? []).includes("switch");
+                    const pendingThis =
+                      devicePendingId === device.device_id;
                     return (
                       <li
                         key={device.device_id}
@@ -305,6 +339,19 @@ export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
                           Nominal group power — not multiplied further, not
                           measured power.
                         </p>
+                        {runtime ? (
+                          <p className="mt-1 font-mono text-xs text-zinc-700 dark:text-zinc-300">
+                            Live: {runtime.power_w} W · {runtime.energy_kwh}{" "}
+                            kWh cumulative · {runtime.on ? "on" : "off"}
+                            {runtime.override
+                              ? ` · override ${runtime.override.on ? "on" : "off"} (manual)`
+                              : ""}
+                          </p>
+                        ) : (
+                          <p className="mt-1 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                            Live readings: not available yet
+                          </p>
+                        )}
                         {device.always_on && (
                           <p className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
                             Always-on exception
@@ -316,6 +363,41 @@ export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
                             {grace !== null &&
                               ` · vacancy grace ${grace} s`}
                           </p>
+                        )}
+                        {controllable && onDeviceCommand && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              disabled={mutateDisabled || pendingThis}
+                              onClick={() =>
+                                onDeviceCommand(device.device_id, "on")
+                              }
+                              className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                            >
+                              {pendingThis ? "…" : "On"}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={mutateDisabled || pendingThis}
+                              onClick={() =>
+                                onDeviceCommand(device.device_id, "off")
+                              }
+                              className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                            >
+                              {pendingThis ? "…" : "Off"}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={mutateDisabled || pendingThis}
+                              onClick={() =>
+                                onDeviceCommand(device.device_id, "clear")
+                              }
+                              title="Return to backend policy/base control"
+                              className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                            >
+                              {pendingThis ? "…" : "Clear (back to backend control)"}
+                            </button>
+                          </div>
                         )}
                       </li>
                     );
@@ -329,13 +411,31 @@ export default function OfficeMap({ backendUrl }: { backendUrl: string }) {
                   hidden.
                 </p>
               )}
-              <div className="mt-3 rounded-lg bg-zinc-50 p-3 dark:bg-zinc-900">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Current occupancy, live consumption, and on/off state:{" "}
-                  <span className="font-medium">Not available yet</span> (no
-                  runtime data in this assignment).
-                </p>
-              </div>
+              {live &&
+                (() => {
+                  const knownIds = new Set(
+                    inventory.devices.map((d) => d.device_id),
+                  );
+                  const extra = [...live.devices.keys()].filter(
+                    (id) => !knownIds.has(id),
+                  );
+                  return extra.length > 0 ? (
+                    <p className="mt-3 text-xs text-amber-700 dark:text-amber-300">
+                      Runtime reports {extra.length} device(s) not in the
+                      loaded inventory: {extra.join(", ")}. Shown here, not
+                      merged into inventory.
+                    </p>
+                  ) : null;
+                })()}
+              {!live && (
+                <div className="mt-3 rounded-lg bg-zinc-50 p-3 dark:bg-zinc-900">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Current occupancy, live consumption, and on/off state:{" "}
+                    <span className="font-medium">Not available yet</span>{" "}
+                    (no runtime data — start a run and wait for state).
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">

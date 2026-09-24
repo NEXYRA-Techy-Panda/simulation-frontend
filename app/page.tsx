@@ -1,5 +1,5 @@
 import ConnectionPanel from "./components/connection-panel";
-import OfficeMap from "./components/office-map";
+import SimLive from "./components/sim-live";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_SIMULATION_BACKEND_URL ?? "(not configured)";
@@ -16,7 +16,7 @@ export default function Home() {
         </p>
       </header>
       <main className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <OfficeMap backendUrl={backendUrl} />
+        <SimLive backendUrl={backendUrl} />
         <div className="flex flex-col gap-6">
           <ConnectionPanel backendUrl={backendUrl} kind="simulator" />
           <section className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">

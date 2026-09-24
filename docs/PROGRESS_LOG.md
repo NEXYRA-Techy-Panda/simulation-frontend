@@ -297,3 +297,22 @@ correction entry; do not rewrite history.
 - Real backend :4000 refused (integration pending); browser/keyboard/narrow-screen interaction unverified beyond SSR markup; no screenshots. Auditor-frontend and all backend repos untouched. Review pending; no approval claimed.
 - Next action: commit, push main, verify remote hash; return P005 evidence. Stop after P005.
 - Commit references: P001 pushed; P005 recorded after push.
+---
+
+## 2026-09-24 20:21:58 +05:30 (IST) - P009 S9/K1-UI started (actual, Agent A - OpenCode)
+
+- P005 accepted for implementation; browser/map/CORS checks remain outstanding (recorded).
+- Exclusive writer: simulation-frontend only. Claude Code modifies simulation-backend (P008); Codex owns auditor imports. No sibling/parent/contract writes; no backend processes started or stopped.
+- Startup: AGENTS.md absent; context + P005 evidence + API 1.0.1 read; main clean at expected baseline 6936b58, fetch clean.
+- P004 shapes read read-only at backend commit 93da205 (simulation routes, engine state/summary/command responses, HTTP tests). P008 worktree files untouched by design; stable commit preferred.
+- Next action: implement sim-state lib + clocks/controls/live UI with committed node:test checks.
+- Review status: pending. P009 commit: none yet.
+---
+
+## 2026-09-24 20:35:00 +05:30 (IST) - P009 S9/K1-UI completed (actual, Agent A - OpenCode)
+
+- Clocks/controls/live polling/readings/lighting commands implemented against P004 shapes (read-only at 93da205). 18/18 committed tests; 75/75 contract; typecheck/lint(0 errors)/build green; HTTP-200 markup; own server stopped.
+- Real backend :4000 refused (no listener; P008 in progress) - no mutations attempted; coordinated live-mutation testing stays a later check. Browser interaction unverified; no screenshots. Sibling repos untouched. Review pending; no approval claimed.
+- 3 questions for Claude Code recorded in P009 evidence (start/resume empty bodies, no-run speed persistence, upcoming state fields).
+- Next action: commit, push main, verify remote hash; return P009 evidence. Stop after P009.
+- Commit references: P005 pushed; P009 recorded after push.

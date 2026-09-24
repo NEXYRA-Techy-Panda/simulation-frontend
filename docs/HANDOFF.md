@@ -2,7 +2,7 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **P005 S10-A** (office map + inventory, Agent A —
+- Current layer: **P009 S9/K1-UI** (clocks, state, controls, Agent A —
   OpenCode) — status **completed**, review **pending**. Contract: **1.0.1
   authoritative, read-only**.
 - P005 S10-A addendum (completed, review pending): office-map screen —
@@ -16,6 +16,15 @@
   HTTP-200 markup; real backend down (pending); browser interaction
   unverified. Details in [P005_S10_A_EVIDENCE.md](P005_S10_A_EVIDENCE.md).
   Auditor-frontend untouched. History preserved.
+- P009 S9/K1-UI addendum (completed, review pending): analogue+digital clocks
+  from one sim_time_utc (Asia/Kolkata), lifecycle status, 1–1000× selector,
+  start/pause/resume/reset, ~1/s polling (timeout/abort/no-overlap/seq
+  tracking/backoff/retry/visibility), stale labeling, office/room/device live
+  readings + occupancy, lighting on/off/clear for P004-supported devices.
+  Verified: 18/18 committed tests, 75/75 contract, typecheck/lint(0 errors)/
+  build green, HTTP-200 markup; real backend down (pending); browser
+  interaction unverified. Details in [P009_K1_UI_EVIDENCE.md](P009_K1_UI_EVIDENCE.md).
+  History preserved.
 - P001 F4-A addendum (completed, review pending): browser-side connection
   panel (`NEXT_PUBLIC_SIMULATION_BACKEND_URL` + `/api/v1/health`, 8 s timeout,
   abort on unmount, no duplicates/polling); states incl. not_initialized =

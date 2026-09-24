@@ -127,12 +127,13 @@ claimed).
 
 ## Publication and observed deployment
 
-Publication was performed normally after the green gates. The follow-up review
-fix commit is `a47204d`; final remote hashes are recorded after its publication.
+Publication was performed normally after the green gates. The implementation
+merge is `bacc8ff`, review fixes are `a47204d`, and the final documentation
+commit/remote head is `53d5bc9`.
 
 ```text
 simulation-backend origin/main: 5cb824dc581495a9d1ea9db114cac6823f2e7c1a
-simulation-frontend origin/main: pending publication of a47204d
+simulation-frontend origin/main: 53d5bc9 (merge bacc8ff + review a47204d + docs)
 ```
 
 Read-only public observations after publication:
@@ -149,6 +150,10 @@ Read-only public observations after publication:
   until map selection.
 - The observed deployed frontend had no horizontal overflow at 1280px or true
   375px CDP width, and no mobile button exceeded the viewport.
+- After the review follow-up propagated, the deployed chart exposed
+  `aria-pressed="true"` for Office/Graphs, `false` for the inactive scope/table
+  controls, and retained the disabled device scope. This confirms the follow-up
+  revision was observed, not merely pushed.
 
 These were GET/HEAD-style read-only checks. No public lifecycle, device, reset,
 or database mutation was sent. The chart deployment is therefore observed, but

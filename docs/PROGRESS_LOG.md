@@ -482,3 +482,15 @@ correction entry; do not rewrite history.
   build, and contract 75/75 pass. The initial deployed revision was observed
   before this follow-up; push/re-observation remains pending. No public mutation
   was performed. K004 remains out of scope.
+
+---
+
+## 2026-09-25 04:10:00 +05:30 (IST) — SIM-INTEGRATION review fixes published (Kishore | K-A — OpenCode)
+
+- Pushed follow-up `a47204d` and final continuity commit; frontend remote is
+  `53d5bc9` (implementation merge `bacc8ff`). Backend remote remains `5cb824d`.
+- Re-observed the deployed frontend after propagation: chart state rendered,
+  Office/Graphs pressed states were exposed, device scope stayed disabled until
+  selection, and true 375px width had no overflow or out-of-viewport buttons.
+- No public lifecycle/device/reset/database mutation was sent. Integration is
+  closed under SIM-INTEGRATION; do not start K004.

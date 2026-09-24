@@ -14,9 +14,9 @@ Kishore | K-A — OpenCode.
 
 ## status
 
-in_progress — K003 and the chart merge are preserved; review follow-up `a47204d`
-closes medium telemetry/accessibility gaps and is green locally. Normal push
-and post-push read-only deployment observation remain.
+completed — K003 and the chart merge are preserved; review follow-up `a47204d`
+and final docs `53d5bc9` are pushed and observed read-only on the deployed
+frontend. No public mutation was performed.
 
 Review status: pending (never self-approved).
 
@@ -73,9 +73,9 @@ Review status: pending (never self-approved).
   typecheck/build passed, lint has one pre-existing verifier warning, contract
   75/75. K003 export remains mounted; headless disk persistence remains
   unclaimed.
-- The prior frontend publication was observed, but follow-up `a47204d` is not yet
-  published. Do not claim the review fixes are deployed until the remote hash
-  and read-only frontend observation are refreshed.
+- Final remote state: backend `5cb824d`, frontend `53d5bc9` (implementation
+  merge `bacc8ff`, review fixes `a47204d`). Public health/runs/export and
+  deployed chart/375px observations are recorded; no mutation was sent.
 
 ## files and safety
 
@@ -90,6 +90,5 @@ feature work.
 
 ## exact next action
 
-Push review follow-up `a47204d`, update the continuity/deployment record with
-its remote hash, and repeat read-only deployed frontend chart/375px checks.
-Do not start K004.
+Integration is closed through publication and read-only observation. Do not
+start K004 or unrelated feature work.

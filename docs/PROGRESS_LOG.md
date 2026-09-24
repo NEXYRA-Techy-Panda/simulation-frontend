@@ -363,6 +363,6 @@ correction entry; do not rewrite history.
 - Backend half of K002 (run-scoped policy activation; migration `003_run_policy_activation`; 61/61 tests; real-HTTP reproduction) is recorded in `../simulation-backend/docs/K002_POLICY_TIMING_EVIDENCE.md`. No frontend runtime behaviour changed.
 - Browser verification: still NOT performed (no browser ability in session) - the K001 manual checklist in `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md` S10 remains the outstanding item.
 - Files changed: created `.gitattributes`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. `.next/` remains git-ignored.
-- Review status: pending (no self-assigned approval). Commit references: the K002 commit recorded in the K002 return report after push.
+- Review status: pending (no self-assigned approval). Commit references: simulation-frontend `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed, local == origin/main); the K002 `.gitattributes` is in `e227839`.
 - Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
 - Next action: complete the manual browser checklist against a local backend run and record the results; the backend policy-timing correction is the next recommended K-layer. Do not start simulator features until assigned.

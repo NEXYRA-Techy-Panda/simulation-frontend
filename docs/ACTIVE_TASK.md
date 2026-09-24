@@ -138,5 +138,6 @@ in its `docs/K002_POLICY_TIMING_EVIDENCE.md`. Mohan owns `auditor-frontend`,
 
 ## Commit reference
 
-Base: `e227839`. K002: the commit containing this file (hash recorded in the K002
-return report after push).
+Base: `e227839`. K002 documentation:
+`906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed to `main`). A short
+follow-up documentation commit records this hash.

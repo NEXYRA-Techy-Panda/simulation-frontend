@@ -2,9 +2,40 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **P011 F6-frontend** (Kishore handoff, Agent A —
-  OpenCode) — status **completed**, review **pending**. Contract: **1.0.1
-  authoritative, read-only**.
+- Current layer: **K001 / K0 — setup and onboarding** (Agent K — Kishore's
+  coding agent) — status **completed**, review **pending**. Kishore's laptop
+  workspace, handoff and baseline were verified; no app source, config,
+  dependency or lockfile was changed. Contract: **1.0.1 authoritative,
+  read-only**. Note for Windows clones with `core.autocrlf=true`: the contract
+  verifier reports **67/75** — the 8 failures are manifest byte-hash
+  line-ending mismatches, not semantic failures (K001 addendum below and
+  [K001 evidence §8](K001_KISHORE_ONBOARDING_EVIDENCE.md)).
+- K001 addendum (2026-09-24, Agent K — Kishore's coding agent, setup/onboarding
+  only, review **pending**; prompted as P018, renamed K001 before it ran — no
+  P018 record existed, so no history was rewritten): reused the existing clone
+  on Kishore's laptop (`main` at `2de8caa` == the reported P011 baseline ==
+  `origin/main`, clean tree, fetch clean, repo-local identity Kishore's, not
+  Mohan's). Toolchain: Windows 11 build 26200 in Git Bash, git
+  `2.55.0.windows.4`, node `v24.19.0`, npm `11.17.0`, ports 3000/4000 free;
+  `npm ci` clean with versions unchanged (npm 11 blocked the unrs-resolver
+  postinstall — cosmetic). Checks: `typecheck` 0, `lint` 0 errors / 1
+  pre-existing warning, `npm test` **18/18**, `npm run build` 0 (`/` and
+  `/_not-found` static), `verify:contract` **67 passed / 8 failed (exit 1)** —
+  the same line-ending manifest hash failures as the backend, cause proven
+  (evidence §8), not fixed in a setup task. Live serve: production
+  `next start -p 3000` served `GET /` **HTTP 200** (16,282 bytes) with the
+  header/lifecycle/refresh/connection markers and **no room names in SSR**
+  (correct: inventory is fetched client-side), while the compiled backend ran
+  on 4000 against a scratch database and returned `ok` with
+  `Access-Control-Allow-Origin: http://localhost:3000`; the POST preflight for
+  `/api/v1/control/start` returned **204**. Confirmed by inspection that
+  `NEXT_PUBLIC_SIMULATION_BACKEND_URL` is origin-only (read in the server
+  component `app/page.tsx` and passed as a prop; libs append the full
+  `/api/v1/...` paths), so no duplicated prefix is possible and nothing is
+  inlined into client chunks. Browser verification not performed (no browser
+  in session) — manual checklist in
+  [K001_KISHORE_ONBOARDING_EVIDENCE.md](K001_KISHORE_ONBOARDING_EVIDENCE.md).
+  No process left running; ports free.
 - P005 S10-A addendum (completed, review pending): office-map screen —
   inventory loading/error/loaded/empty states + manual refresh, top-down SVG
   keyed by five stable room IDs (corridor, labels, selectable regions,

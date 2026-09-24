@@ -292,7 +292,7 @@ export function deviceBody(on: "on" | "off" | "clear"): DeviceControlBody {
   return on === "clear" ? { clear_override: true } : { manual_state: on };
 }
 
-async function readErrorBody(res: {
+export async function readErrorBody(res: {
   status: number;
   json: () => Promise<unknown>;
 }): Promise<{ code?: string; message?: string; field?: string }> {
@@ -310,7 +310,7 @@ async function readErrorBody(res: {
   }
 }
 
-async function postJson(
+export async function postJson(
   origin: string,
   path: string,
   body: unknown,

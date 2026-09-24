@@ -8,7 +8,7 @@
     "start": "next start -p 3000",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test app/lib/__tests__/sim-state.test.mjs",
+    "test": "node --test app/lib/__tests__/sim-state.test.mjs app/lib/__tests__/fast-days.test.mjs",
     "verify:contract": "node scripts/verify-contract.mjs"
   },
   "dependencies": {

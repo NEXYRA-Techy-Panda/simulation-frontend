@@ -49,6 +49,10 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
   const mounted = useRef(true);
   const pendingRef = useRef<PendingOp>(null);
   const simRef = useRef<SimState | null>(null);
+  const pollRef = useRef<((force?: boolean) => Promise<void>) | null>(null);
+  const commandEpoch = useRef(0);
+  const commandInFlight = useRef(false);
+  const queuedForcedPoll = useRef(false);
 
   // Effect-synced mirror for callbacks (ref writes belong here, not render).
   useEffect(() => {
@@ -59,18 +63,35 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
     async (force = false) => {
       const origin = sanitizeOrigin(backendUrl);
       if (!origin) return;
+      if (commandInFlight.current) {
+        if (force) queuedForcedPoll.current = true;
+        return;
+      }
       if (typeof document !== "undefined" && document.hidden && !force) return;
       if (Date.now() < nextAllowedAt.current && !force) return;
-      if (!flight.current.tryAcquire()) return; // never overlap polls
+      if (!flight.current.tryAcquire()) {
+        // A forced refresh after a command must not be silently lost while a
+        // poll is finishing. Queue exactly one follow-up refresh.
+        if (force) queuedForcedPoll.current = true;
+        return;
+      }
+      const epoch = commandEpoch.current;
       const controller = new AbortController();
       pollAbort.current = controller;
       try {
         const state = await fetchSimState(
           origin,
-          (url, init) => fetch(url, { ...init, signal: controller.signal }),
+          (url, init) => {
+            const signal = init?.signal
+              ? AbortSignal.any([init.signal, controller.signal])
+              : controller.signal;
+            return fetch(url, { ...init, signal });
+          },
           STATE_TIMEOUT_MS,
         );
-        if (!mounted.current) return;
+        // A command may have invalidated this response while it was in flight.
+        // Never let a pre-command poll overwrite the post-command state.
+        if (!mounted.current || epoch !== commandEpoch.current) return;
         const decision = shouldApplyUpdate(tracked.current, {
           run_id: state.run_id,
           seq: state.seq,
@@ -85,12 +106,14 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         setLoadError(null);
         setLastSuccessIso(new Date().toISOString());
       } catch {
-        if (!mounted.current) return;
+        // An aborted/superseded poll is expected during a mutation. Do not
+        // turn it into a user-visible stale/error state.
+        if (!mounted.current || epoch !== commandEpoch.current) return;
         // Preserve last-known readings; label stale. Never claim stopped.
         failCount.current += 1;
         nextAllowedAt.current =
           Date.now() + backoffForFailures(failCount.current);
-        if (sim) {
+        if (simRef.current) {
           setStale(true);
         } else {
           setLoadError(
@@ -100,10 +123,25 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
       } finally {
         flight.current.release();
         if (pollAbort.current === controller) pollAbort.current = null;
+        if (queuedForcedPoll.current && mounted.current) {
+          queuedForcedPoll.current = false;
+          window.setTimeout(() => {
+            if (mounted.current) void pollRef.current?.(true);
+          }, 0);
+        }
       }
     },
-    [backendUrl, sim],
+    [backendUrl],
   );
+
+  // Keep a stable callback reference for a forced poll queued by a finishing
+  // request, without making the polling callback depend on itself.
+  useEffect(() => {
+    pollRef.current = poll;
+    return () => {
+      if (pollRef.current === poll) pollRef.current = null;
+    };
+  }, [poll]);
 
   // Command errors need sim/stale context: simRef is synced in an effect above.
   const runCommand = useCallback(
@@ -111,8 +149,9 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
       op: Exclude<PendingOp, null>,
       label: string,
       fn: (origin: string) => Promise<{
-        run_id: string | null;
-        seq: number | null;
+        run_id?: string | null;
+        seq?: number | null;
+        speed?: Speed;
       }>,
       deviceId?: string,
     ) => {
@@ -122,31 +161,58 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         setCommandError("Backend URL is missing or invalid.");
         return;
       }
+      // Invalidate any in-flight poll before a mutation. Otherwise a poll
+      // that started before reset can finish afterward and restore the old run.
+      commandEpoch.current += 1;
+      commandInFlight.current = true;
+      pollAbort.current?.abort();
       pendingRef.current = op;
       setPendingOp(op);
       if (deviceId) setDevicePendingId(deviceId);
       setCommandError(null);
       try {
         const summary = await fn(origin);
+        commandInFlight.current = false;
         if (!mounted.current) return;
-        // Adopt the authoritative run/seq from the confirmed response, then
-        // fetch full state. Displayed readings change only via fetched state.
-        const decision = shouldApplyUpdate(tracked.current, {
-          run_id: summary.run_id,
-          seq: summary.seq,
-        });
-        if (decision.apply) tracked.current = decision.tracked;
+        // Adopt the authoritative run/seq when the control route returns a
+        // lifecycle summary. The speed route intentionally returns only speed;
+        // in that case the forced state poll below is the authoritative update.
+        if (summary.run_id !== undefined && summary.seq !== undefined) {
+          const decision = shouldApplyUpdate(tracked.current, {
+            run_id: summary.run_id,
+            seq: summary.seq,
+          });
+          if (decision.apply) tracked.current = decision.tracked;
+        }
         failCount.current = 0;
         nextAllowedAt.current = 0;
         await poll(true);
       } catch (err) {
+        commandInFlight.current = false;
         if (!mounted.current) return;
-        setCommandError(
+
+        // A transport/response-shape failure can happen after the backend has
+        // already applied a mutation. Reconcile before reporting it, especially
+        // for reset, so the UI does not immediately show stale pre-reset data.
+        if (
+          err instanceof SimApiError &&
+          (err.code === "BAD_RESPONSE" ||
+            err.code === "TIMEOUT" ||
+            err.code === "UNREACHABLE")
+        ) {
+          await poll(true);
+        }
+
+        const detail =
           err instanceof SimApiError
-            ? `${label} failed: ${err.message}`
-            : `${label} failed with an unknown error.`,
+            ? err.message
+            : "unknown error.";
+        const prefix = `${label} failed`;
+        setCommandError(
+          detail.startsWith(`${prefix}:`) ? detail : `${prefix}: ${detail}`,
         );
       } finally {
+        commandInFlight.current = false;
         if (mounted.current) {
           pendingRef.current = null;
           setPendingOp(null);

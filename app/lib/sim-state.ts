@@ -317,7 +317,7 @@ async function postJson(
   fetchImpl: FetchLike,
   timeoutMs: number,
   fallback: string,
-): Promise<Record<string, unknown>> {
+): Promise<{ data: Record<string, unknown>; status: number }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -354,7 +354,7 @@ async function postJson(
         "BAD_RESPONSE",
       );
     }
-    return data;
+    return { data, status: res.status };
   } catch (err) {
     if (err instanceof SimApiError) throw err;
     const aborted = err instanceof Error && err.name === "AbortError";
@@ -376,26 +376,48 @@ export interface CommandSummary {
   run_id: string | null;
   seq: number | null;
   sim_time_utc: string | null;
-  status: Lifecycle | null;
-  speed: Speed | null;
+  status: Lifecycle;
+  speed: Speed;
 }
 
-/** Control-route summary; fields beyond these are accepted and ignored. */
+/** The speed endpoint intentionally returns only the changed speed. */
+export interface SpeedCommandResult {
+  speed: Speed;
+}
+
+/** Parse the full lifecycle summary returned by start/pause/resume/reset. */
 export function parseCommandSummary(json: unknown): CommandSummary | null {
   const o = unwrap(json);
   if (!o) return null;
-  const run_id = o.run_id === null ? null : reqString(o, "run_id");
-  if (run_id === null && o.run_id !== null) return null;
-  const seq =
-    o.seq === null ? null : typeof o.seq === "number" && Number.isInteger(o.seq) && o.seq >= 0 ? o.seq : null;
-  if (seq === null && o.seq !== null) return null;
-  const sim_time_utc = o.sim_time_utc === null ? null : reqString(o, "sim_time_utc");
-  if (sim_time_utc === null && o.sim_time_utc !== null) return null;
-  const status = o.status === undefined ? null : isLifecycle(o.status) ? o.status : undefined;
-  if (status === undefined) return null;
-  const speed = o.speed === undefined ? null : isSpeedValue(o.speed) ? o.speed : undefined;
-  if (speed === undefined) return null;
-  return { run_id, seq, sim_time_utc, status, speed };
+  if (o.run_id === undefined || o.seq === undefined || o.sim_time_utc === undefined || o.status === undefined) {
+    return null;
+  }
+
+  const run_id = reqString(o, "run_id");
+  const seq = reqInt(o, "seq", 0, Number.MAX_SAFE_INTEGER);
+  const sim_time_utc = reqString(o, "sim_time_utc");
+  if (!run_id || seq === null || !sim_time_utc) return null;
+  if (Number.isNaN(Date.parse(sim_time_utc))) return null;
+  if (!isLifecycle(o.status) || !isSpeedValue(o.speed)) return null;
+
+  return {
+    run_id,
+    seq,
+    sim_time_utc,
+    status: o.status,
+    speed: o.speed,
+  };
+}
+
+/** Parse the intentionally lightweight speed acknowledgement. */
+export function parseSpeedCommandResult(
+  json: unknown,
+  expectedSpeed?: Speed,
+): SpeedCommandResult | null {
+  const o = unwrap(json);
+  if (!o || !isSpeedValue(o.speed)) return null;
+  if (expectedSpeed !== undefined && o.speed !== expectedSpeed) return null;
+  return { speed: o.speed };
 }
 
 export interface DeviceCommandResult {
@@ -426,12 +448,44 @@ async function sendCommand(
   timeoutMs: number,
   fallback: string,
 ): Promise<CommandSummary> {
-  const data = await postJson(origin, path, body, fetchImpl, timeoutMs, fallback);
+  const { data, status } = await postJson(
+    origin,
+    path,
+    body,
+    fetchImpl,
+    timeoutMs,
+    fallback,
+  );
   const parsed = parseCommandSummary(data);
   if (!parsed) {
     throw new SimApiError(
       `${fallback}: response body was malformed.`,
-      null,
+      status,
+      "BAD_RESPONSE",
+    );
+  }
+  return parsed;
+}
+
+async function sendSpeedCommand(
+  origin: string,
+  speed: Speed,
+  fetchImpl: FetchLike,
+  timeoutMs: number,
+): Promise<SpeedCommandResult> {
+  const { data, status } = await postJson(
+    origin,
+    "/api/v1/control/speed",
+    speedBody(speed),
+    fetchImpl,
+    timeoutMs,
+    "Speed change failed",
+  );
+  const parsed = parseSpeedCommandResult(data, speed);
+  if (!parsed) {
+    throw new SimApiError(
+      "Speed change failed: response body was malformed.",
+      status,
       "BAD_RESPONSE",
     );
   }
@@ -451,7 +505,7 @@ export function resetRun(origin: string, fetchImpl: FetchLike, timeoutMs = COMMA
   return sendCommand(origin, "/api/v1/control/reset", resetBody(), fetchImpl, timeoutMs, "Reset failed");
 }
 export function setSpeed(origin: string, speed: Speed, fetchImpl: FetchLike, timeoutMs = COMMAND_TIMEOUT_MS) {
-  return sendCommand(origin, "/api/v1/control/speed", speedBody(speed), fetchImpl, timeoutMs, "Speed change failed");
+  return sendSpeedCommand(origin, speed, fetchImpl, timeoutMs);
 }
 
 export async function commandDevice(
@@ -461,7 +515,7 @@ export async function commandDevice(
   fetchImpl: FetchLike,
   timeoutMs = COMMAND_TIMEOUT_MS,
 ): Promise<DeviceCommandResult> {
-  const data = await postJson(
+  const { data, status } = await postJson(
     origin,
     `/api/v1/devices/${encodeURIComponent(deviceId)}`,
     deviceBody(control),
@@ -473,7 +527,7 @@ export async function commandDevice(
   if (!parsed || parsed.device_id !== deviceId) {
     throw new SimApiError(
       "Device command answered 2xx but the body was malformed.",
-      null,
+      status,
       "BAD_RESPONSE",
     );
   }

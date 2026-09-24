@@ -13,7 +13,9 @@ import {
   isSpeedValue,
   parseCommandSummary,
   parseDeviceCommandResult,
+  parseSpeedCommandResult,
   parseSimState,
+  resetRun,
   pauseBody,
   resetBody,
   resumeBody,
@@ -121,12 +123,28 @@ describe("command shapes", () => {
     assert.deepEqual(deviceBody("clear"), { clear_override: true });
   });
 
-  it("parses command summaries and device results", () => {
+  it("parses lifecycle and speed-only command summaries", () => {
     const s = parseCommandSummary({
       data: { run_id: "r", seq: 1, sim_time_utc: ENGINE_START_UTC, status: "running", speed: 60 },
     });
     assert.ok(s && s.run_id === "r" && s.speed === 60);
+    const speedOnly = parseSpeedCommandResult({ data: { speed: 60 } });
+    assert.ok(speedOnly && speedOnly.speed === 60);
+    assert.equal(parseCommandSummary({ data: { speed: 60 } }), null);
     assert.equal(parseCommandSummary({ data: { run_id: "r" } }), null);
+    assert.equal(
+      parseCommandSummary({
+        data: { run_id: "r", seq: 1, sim_time_utc: ENGINE_START_UTC, status: "running" },
+      }),
+      null,
+    );
+    assert.equal(
+      parseCommandSummary({
+        data: { run_id: null, seq: 0, sim_time_utc: ENGINE_START_UTC, status: "paused", speed: 1 },
+      }),
+      null,
+    );
+    assert.equal(parseSpeedCommandResult({ data: { speed: 60 } }, 1), null);
     const d = parseDeviceCommandResult({
       data: { device_id: "light-a", override: { active: true, on: true }, seq: 7, sim_time_utc: ENGINE_START_UTC },
     });
@@ -218,6 +236,18 @@ describe("mock fetch behaviour", () => {
     });
   });
 
+  it("does not accept a speed-only acknowledgement for reset", async () => {
+    const response = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ data: { speed: 60 } }),
+    });
+    await assert.rejects(resetRun("http://x", response, 1000), (e) => {
+      assert.ok(e instanceof SimApiError && e.status === 200 && e.code === "BAD_RESPONSE");
+      return true;
+    });
+  });
+
   it("refused connections throw, never return partial state", async () => {
     const down = async () => {
       throw new TypeError("fetch failed");
@@ -240,7 +270,8 @@ describe("mock fetch behaviour", () => {
         seen.push({ method: req.method, url: req.url, body: raw ? JSON.parse(raw) : undefined });
         res.writeHead(200, { "content-type": "application/json" });
         if (req.url === "/api/v1/control/speed") {
-          res.end(JSON.stringify({ data: { run_id: "r", seq: 3, sim_time_utc: ENGINE_START_UTC, status: "paused", speed: 60 } }));
+          // The live contract intentionally returns only the changed speed.
+          res.end(JSON.stringify({ data: { speed: 60 } }));
         } else {
           res.end(JSON.stringify(RUNNING));
         }

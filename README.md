@@ -5,14 +5,14 @@ and auditing project.
 
 - **Role**: Next.js + React + TypeScript + Tailwind app that sends commands to
   `simulation-backend` and renders its authoritative state (5-room map,
-  occupant dots, clocks, devices, history, export triggers).
+  clocks, devices, live telemetry charts, history, export triggers).
 - **Owner**: Mohan (foundation F0–F6) → Kishore Kumar (after handoff).
 - **Frontend port**: `3000`. Public backend:
   `https://git-pipeline.metatronhost.in/sim`.
-- **Current state (K003, 2026-09-25)**: authoritative simulator UI plus
-  historical JSON/CSV export controls; review pending. The panel uses persisted
-  run coverage and the fixed public `/sim` API base. Responsive 375px and desktop
-  layouts have direct current-build evidence.
+- **Current state (SIM-INTEGRATION, 2026-09-25)**: authoritative simulator UI,
+  historical JSON/CSV export controls, and bounded live power/energy charts;
+  review pending. The chart uses the existing polling stream and real map
+  selection, while export coverage remains persisted and `/sim`-anchored.
 
 Docs:
 
@@ -27,6 +27,7 @@ Docs:
 - [Service interfaces](contracts/v1/API.md)
 - [F2-A evidence](docs/F2_A_EVIDENCE.md)
 - [K003 export UI evidence](docs/K003_EXPORT_UI_EVIDENCE.md)
+- [SIM-INTEGRATION chart evidence](docs/SIM_INTEGRATION_EVIDENCE.md)
 
 ## Developer setup (F2-A foundation)
 
@@ -51,6 +52,15 @@ aggregation. It does not calculate telemetry or use live simulated time as
 coverage. Equivalent file downloads share a backend export identity. Full
 wiring, numerical tests and browser evidence are in
 [`docs/K003_EXPORT_UI_EVIDENCE.md`](docs/K003_EXPORT_UI_EVIDENCE.md).
+
+## Live telemetry charts
+
+The chart coordinator is mounted below the office map and consumes the existing
+`SimLive` polling state. It shows sampled power, actual cumulative energy,
+explicit stale/gap status, bounded per-scope history, an accessible data table,
+and real room/device chart selection. It does not add a second polling loop or
+calculate simulator telemetry. Integration evidence is in
+[`docs/SIM_INTEGRATION_EVIDENCE.md`](docs/SIM_INTEGRATION_EVIDENCE.md).
 
 Deployment configuration is fixed in
 [`app/lib/deployment-config.ts`](app/lib/deployment-config.ts). The public API

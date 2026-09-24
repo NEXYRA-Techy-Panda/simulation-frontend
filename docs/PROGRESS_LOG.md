@@ -363,7 +363,6 @@ correction entry; do not rewrite history.
 - Backend half of K002 (run-scoped policy activation; migration `003_run_policy_activation`; 61/61 tests; real-HTTP reproduction) is recorded in `../simulation-backend/docs/K002_POLICY_TIMING_EVIDENCE.md`. No frontend runtime behaviour changed.
 - Browser verification: still NOT performed (no browser ability in session) - the K001 manual checklist in `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md` S10 remains the outstanding item.
 - Files changed: created `.gitattributes`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. `.next/` remains git-ignored.
-- Review status: pending (no self-assigned approval). Commit references: simulation-frontend `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed, local == origin/main); the K002 `.gitattributes` is in `e227839`.
 - Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
 
 ---
@@ -388,3 +387,69 @@ correction entry; do not rewrite history.
   processes stopped and ports clear. Evidence: `K003_EXPORT_UI_EVIDENCE.md`.
 - Review pending. Exact next action: final docs/diff/staged review, all gates,
   normal commit/push and remote hash verification. Stop after K003; no K004.
+
+---
+
+## 2026-09-25 03:00:00 +05:30 (IST) — SIM-CHART-01 completed (Agent K-C — Antigravity Gemini)
+
+- Assignment: SIM-CHART-01 (Live simulator graphs, milestone 1 / 2). Owner: Kishore Kumar.
+- Branch: `kishore/sim-chart-01` in worktree `../simulation-frontend-charts`, based on clean committed `main` at `dbcbee9b935a3f6777f7a8bfca097d258e02e652`. Main branch was not modified.
+- Scope: Implemented isolated scrolling ECG-style live telemetry graphs (Live Power Trend in W/kW, Cumulative Energy Trend in kWh, scope toggles for Office, Selected Room, Selected Device, accessible recent-values data table).
+- Data Semantics:
+  - Bounded ring buffer capped at 600 samples per scope (`app/lib/chart-buffer.ts`).
+  - Strict sequence monotonicity (`seq <= lastSeq` discarded).
+  - Same-time updates update latest sample in-place without zero-duration duplicate steps.
+  - Missing readings remain `null` (gaps), never fabricated zeros.
+  - Paused state updates status without phantom horizontal time stretch.
+  - Formats horizontal time axis in `Asia/Kolkata` (`HH:mm:ss`).
+  - Recorded history adapter (`app/lib/history-adapter.ts`) distinguishes interval average from peak power.
+- Checks & Evidence:
+  - `npm test`: 29 passed, 0 failed (19 sim-state + 10 chart-buffer).
+  - `npm run typecheck`: clean exit 0.
+  - `npm run lint`: 0 errors, 1 pre-existing warning.
+  - `next build`: clean exit 0.
+  - Isolated preview screenshots were mock visual evidence, not telemetry proof;
+    they are not retained as product evidence in this integration.
+- Documentation: created `docs/SIM_CHART_01_EVIDENCE.md`; branch continuity changes
+  are merged here without replacing the K003 record.
+- Review status: pending (never self-assigned).
+- Next action: K-A mounts and verifies the chart against the existing polling
+  stream, then runs combined gates and publishes the integration.
+
+---
+
+## 2026-09-25 03:15:00 +05:30 (IST) — SIM-INTEGRATION chart checkpoint (Kishore | K-A — OpenCode)
+
+- Preserved K003 in frontend commit `c4b319d`; merged chart commit
+  `9fc0f79` normally rather than resetting the current branch.
+- Source review found backend `run.seq` increments on every processed step and
+  on state-changing controls. The existing equal-seq acceptance and chart
+  run/sequence/time identity must be retained.
+- Chart integration remains incomplete until the component is mounted on the
+  existing `SimLive` stream, real room/device selection is wired, and scratch
+  telemetry is exercised. No deployment or production mutation is claimed.
+
+---
+
+## 2026-09-25 03:25:00 +05:30 (IST) — SIM-INTEGRATION local telemetry verification (Kishore | K-A — OpenCode)
+
+- Mounted `LiveCharts` below `OfficeMap`; it receives the existing `SimLive`
+  state/stale flag and adds no polling loop. `OfficeMap` now reports real room
+  and device selection; unavailable device scope is visibly disabled.
+- Corrected all-device buffer retention, equal-seq stale/fresh status updates,
+  null gaps, actual (un-clamped) cumulative energy, sampled min/max labels,
+  date context for multi-day windows, and reduced-motion classes.
+- Corrected the inventory refresh effect loop and deferred the initial forced
+  state poll 50 ms for effect/StrictMode settling; existing lifecycle, command,
+  stale/backoff, export, and `/sim` behavior remain intact.
+- Isolated scratch browser run: backend office `168 W`, `0.006066666666666666
+  kWh` matched chart `#15` `168 W`, `0.0061 kWh`; supported meeting light
+  changed `72 W` on and `0 W` off with matching chart rows; pause froze
+  `2025-12-31T18:32:10Z`; reset agreed on a new run and one `#0` chart sample.
+  True 375px CDP check had client/scroll `375/375`, no horizontal overflow, and
+  chart controls within x=338.
+- Combined tests reached 42/42, typecheck/build passed, lint has one pre-existing
+  verifier warning, and contract remains 75/75. Final post-doc gates and normal
+  commit/push remain. No public deployment or production mutation is claimed.
+- Evidence: `docs/SIM_INTEGRATION_EVIDENCE.md` and the current-build temporary
+  screenshots under the approved temp directory. Do not start K004.

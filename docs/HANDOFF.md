@@ -1,6 +1,28 @@
 # HANDOFF — simulation-frontend
 
-## K003 current addendum (2026-09-25, Kishore | K-A — OpenCode)
+## SIM-INTEGRATION current addendum (2026-09-25, Kishore | K-A — OpenCode)
+
+- Chart branch `9fc0f79` is merged into the K003-preserving main line. K003
+  export UI remains intact; the chart is mounted below the current office map
+  and consumes the existing `SimLive` polling stream.
+- `OfficeMap` reports actual room/device selection. Device scope is visibly
+  disabled until **Chart device** is selected; scope changes retain bounded
+  per-scope history. Run changes alone clear the buffer.
+- Backend source confirms sequence advancement per processed step/control.
+  Buffer tests cover equal-seq stale/fresh transitions, all-device retention,
+  null gaps, energy decreases, run reset, boundedness, and date context.
+- Isolated scratch browser verification matched backend office power/energy,
+  responded to a supported device switch (72 W on / 0 W off), froze simulated
+  time on pause, reset to a new run/series, and showed no 375px overflow.
+  Evidence: [SIM_INTEGRATION_EVIDENCE.md](SIM_INTEGRATION_EVIDENCE.md).
+- Two safe integration corrections were made: inventory refresh no longer
+  recreates its own effect/request loop, and the initial forced state poll is
+  deferred 50 ms for the effect/StrictMode cycle. No second polling loop exists.
+- Final combined gates/publication remain pending. No public deployment or
+  production simulator mutation is claimed. K003 sections below are preserved
+  historical continuity.
+
+## K003 historical addendum (2026-09-25, Kishore | K-A — OpenCode)
 
 - Historical run/window/format/resolution selection and one-request JSON/CSV
   download are implemented, review pending. Coverage comes from persisted run
@@ -22,7 +44,17 @@
 
 ## 0. Historical continuity (F0.1, 2026-09-24)
 
-- Current layer: **K002 / K1 — contract checkout portability and run-policy
+- Current layer: **SIM-CHART-01 — Live simulator graphs (Milestone 1 / 2)**
+  (Agent K-C — Antigravity Gemini) — status **completed**, review **pending**.
+  Implemented in isolated branch `kishore/sim-chart-01` in worktree
+  `../simulation-frontend-charts` (base `dbcbee9b935a3f6777f7a8bfca097d258e02e652`).
+  Delivers reusable live power (W/kW) and cumulative energy (kWh) scrolling SVG
+  charts, scope toggles for Office, Room, and Device, accessible table view,
+  bounded ring buffer with out-of-order and duplicate filtering, and recorded
+  history adapter. Tests: 29/29 passed; typecheck/lint clean; build exit 0;
+  headless Chrome visual screenshots in `docs/screenshots/`. Evidence:
+  `docs/SIM_CHART_01_EVIDENCE.md`.
+- Prior layer: **K002 / K1 — contract checkout portability and run-policy
   timing** (Agent K — Kishore's coding agent) — status **completed**, review
   **pending**. In this repository only checkout configuration (`.gitattributes`)
   and documentation changed; no app source, config, dependency, lockfile or

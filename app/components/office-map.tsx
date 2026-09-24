@@ -2,9 +2,10 @@
 
 // Office floor plan + inventory inspection (P005 / S10-A, Agent A — OpenCode).
 // Reads GET /api/v1/inventory only. No clocks, commands, sockets, occupants,
-// dots, switches, charts, or export. Contract v1.0.1, read-only.
+// dots, or export. Its real room/device selection is also exposed to the
+// mounted telemetry chart; device commands remain an explicit existing opt-in.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import {
   INVENTORY_TIMEOUT_MS,
@@ -30,6 +31,13 @@ export interface LiveData {
   rooms: Map<string, RoomState>;
 }
 
+export interface OfficeSelection {
+  roomId: string | null;
+  roomName: string | null;
+  deviceId: string | null;
+  deviceName: string | null;
+}
+
 type Phase = "loading" | "loaded" | "error";
 
 export default function OfficeMap({
@@ -38,18 +46,22 @@ export default function OfficeMap({
   mutateDisabled = false,
   devicePendingId = null,
   onDeviceCommand = null,
+  onSelectionChange = null,
 }: {
   backendUrl: string;
   live?: LiveData | null;
   mutateDisabled?: boolean;
   devicePendingId?: string | null;
   onDeviceCommand?: ((deviceId: string, control: "on" | "off" | "clear") => void) | null;
+  onSelectionChange?: ((selection: OfficeSelection) => void) | null;
 }) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastSuccessIso, setLastSuccessIso] = useState<string | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const inventoryRef = useRef<Inventory | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const mounted = useRef(true);
 
@@ -65,7 +77,7 @@ export default function OfficeMap({
     }
     const controller = new AbortController();
     inFlight.current = controller;
-    if (!inventory) setPhase("loading");
+    if (!inventoryRef.current) setPhase("loading");
     try {
       const r = await fetchInventory(
         origin,
@@ -75,6 +87,7 @@ export default function OfficeMap({
       if (!mounted.current) return;
       if (r.ok) {
         setInventory(r.inventory);
+        inventoryRef.current = r.inventory;
         setLastSuccessIso(r.fetchedAtIso);
         setError(null);
         setPhase("loaded");
@@ -84,15 +97,20 @@ export default function OfficeMap({
             prev,
           ),
         );
+        setSelectedDeviceId((prev) =>
+          prev && r.inventory.devices.some((device) => device.device_id === prev)
+            ? prev
+            : null,
+        );
       } else {
         // Keep previous data visible but labelled stale; fresh error otherwise.
         setError(r.error);
-        if (!inventory) setPhase("error");
+        if (!inventoryRef.current) setPhase("error");
       }
     } finally {
       if (inFlight.current === controller) inFlight.current = null;
     }
-  }, [backendUrl, inventory]);
+  }, [backendUrl]);
 
   useEffect(() => {
     mounted.current = true;
@@ -113,6 +131,20 @@ export default function OfficeMap({
   const selectedDevices = selectedRoom
     ? (grouped?.byRoom.get(selectedRoom.room_id) ?? [])
     : [];
+  const selectedDevice = useMemo(
+    () => inventory?.devices.find((device) => device.device_id === selectedDeviceId) ?? null,
+    [inventory, selectedDeviceId],
+  );
+
+  useEffect(() => {
+    onSelectionChange?.({
+      roomId: selectedRoom?.room_id ?? null,
+      roomName: selectedRoom?.name ?? null,
+      deviceId: selectedDevice?.device_id ?? null,
+      deviceName: selectedDevice?.name ?? null,
+    });
+  }, [onSelectionChange, selectedDevice, selectedRoom]);
+
   const stale = phase === "loaded" && error !== null;
   const knownRooms =
     inventory?.rooms.filter((r) => GEOMETRY[r.room_id]) ?? [];
@@ -120,7 +152,15 @@ export default function OfficeMap({
     inventory?.rooms.filter((r) => !GEOMETRY[r.room_id]) ?? [];
   const hours = inventory ? officeHoursSummary(inventory) : null;
 
-  const selectRoom = (roomId: string) => setSelectedRoomId(roomId);
+  const selectRoom = (roomId: string) => {
+    setSelectedRoomId(roomId);
+    setSelectedDeviceId(null);
+  };
+
+  const selectDevice = (deviceId: string) => {
+    if (!selectedRoom || !selectedDevices.some((device) => device.device_id === deviceId)) return;
+    setSelectedDeviceId(deviceId);
+  };
 
   const onRoomKey = (e: KeyboardEvent, roomId: string) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -352,6 +392,21 @@ export default function OfficeMap({
                             Live readings: not available yet
                           </p>
                         )}
+                        <button
+                          type="button"
+                          data-device-id={device.device_id}
+                          aria-pressed={selectedDeviceId === device.device_id}
+                          onClick={() => selectDevice(device.device_id)}
+                          className={`mt-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                            selectedDeviceId === device.device_id
+                              ? "border-blue-700 bg-blue-100 text-blue-900 dark:border-blue-300 dark:bg-blue-950 dark:text-blue-100"
+                              : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                          }`}
+                        >
+                          {selectedDeviceId === device.device_id
+                            ? "Charting device"
+                            : "Chart device"}
+                        </button>
                         {device.always_on && (
                           <p className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
                             Always-on exception

@@ -2,88 +2,93 @@
 
 ## prompt_id
 
-K003 — historical export UI plus confirmed responsive QA correction (resumed
-under Kishore | K-A — OpenCode).
+SIM-INTEGRATION — chart addition, continuing K003/K004 integration under
+Kishore | K-A — OpenCode.
 
 ## agent / owner
 
 - Developer: Kishore Kumar
 - Agent: K-A — OpenCode
-- Previous owner label: Agent K (Kishore's coding agent)
-- Exclusive scope: `simulation-frontend` only for this task.
+- Previous owners: Agent K (Kishore's coding agent), K-C — Antigravity Gemini
+- Exclusive scope: `simulation-frontend` for this integration task.
 
 ## status
 
-in_progress — export UI, responsive correction, and browser/mock verification
-complete; continuity, final diff review, commit and push remain.
+completed locally — K003 is preserved in commit `c4b319d`; chart branch
+`9fc0f79` is integrated, current-build telemetry/selection verification is
+recorded, and only final staged review plus normal publication remain.
 
 Review status: pending (never self-approved).
 
-## baseline and previous outcome
+## baseline and preserved work
 
-- Resumed clean `main` at `dbcbee9b935a3f6777f7a8bfca097d258e02e652`,
-  which includes deployment baseline `b31ac37` plus the reset/control-ack fix.
-- K002 remains complete, review pending. No K003 source/evidence or unfinished
-  edits existed before this assignment.
-- K-C's `qa-evidence/K003-QA2` mobile report was read. Its 375px screenshot was
-  captured with headless Chrome's minimum 504px window cropped to 375px; source
-  was nevertheless hardened and independently verified with true 375px CDP
-  device metrics.
+- Current main before this merge was K003 commit `c4b319d`, on top of the
+  deployment baseline `dbcbee9`.
+- K003 historical export UI, responsive correction, continuity, and evidence
+  remain intact and must not be reset or discarded.
+- SIM-CHART-01 source/evidence comes from worktree
+  `../simulation-frontend-charts`, branch `kishore/sim-chart-01`, commit
+  `9fc0f79f3082929cd67c475bc4b1902543632090`, based on `dbcbee9`.
+- The chart branch is merged normally; this task adds only the authoritative
+  integration, safety corrections, and verification.
 
-## implemented checkpoint
+## K003 preserved outcome
 
-- Added `HistoricalExportPanel` after the office map.
-- Added a strict paginated run catalog adapter for `GET /api/v1/runs`, including
-  committed coverage, exportability, no-data, cross-page duplicate checks, and
-  current-run selection without a null-to-run duplicate request.
-- Added run, UTC half-open window, JSON/CSV, and six aggregation-resolution
-  controls. Defaults come from persisted committed coverage, never live time.
-- One bounded fetch downloads unmodified backend bytes through a per-download
-  object URL; errors remain on-page, duplicate submits are blocked, refresh and
-  selection cannot race an active download, and success says "download started"
-  rather than claiming disk completion.
-- The committed `/sim` deployment base is preserved exactly. No Vercel env var
-  or telemetry/export calculation was added.
-- Corrected narrow layout: true 375px viewport has no horizontal overflow; all
-  lifecycle buttons, Reset, and Refresh inventory remain visible. Desktop keeps
-  the original inline layout. A consistent visible focus ring was added.
-- K-C's untested claims (interactive room selection, live clocks, keyboard
-  traversal, offline/stale recovery) remain explicitly unclaimed.
+- `HistoricalExportPanel` uses `/sim`, persisted committed coverage, JSON/CSV,
+  all six resolutions, bounded downloads, and honest no-data/error states.
+- True 375px and 1280px layout checks passed; export behavior and lifecycle
+  controls remain covered by K003 evidence.
+
+## SIM-INTEGRATION implementation checkpoint
+
+- Merge chart components and pure buffer/history adapter from `9fc0f79`.
+- Mount `LiveCharts` from the existing `SimLive` polling state; no second poll
+  loop or Socket.IO path.
+- Connect real room/device selection from `OfficeMap`; device scope is disabled
+  clearly until a device is actually selected.
+- Preserve all scope histories in the bounded buffer and bound each scope to
+  600 samples. Do not reset on render/scope changes; reset only on run change.
+- Preserve actual cumulative energy values; never clamp decreases. Use explicit
+  null gaps and stale status, and add date context to long/high-speed windows.
+- Retain the existing export, lifecycle, device-command, and responsive map
+  behavior. Do not overwrite an eventual SIM-VIS-01 illustrated-map redesign;
+  mount below the map for the current integration.
 
 ## verification checkpoint — actual
 
-- `npm test`: 28/28 passed (19 existing + 9 K003 adapter checks).
-- `npm run typecheck`: passed.
-- `npm run lint`: zero errors; one pre-existing warning in the untouched
-  contract verifier (`scripts/verify-contract.mjs:188`).
-- `npm run build`: passed; `/` and `/_not-found` static.
-- `npm run verify:contract`: 75/75.
-- True 375x812 CDP viewport: client/scroll width `375/375`, horizontal overflow
-  false, no button outside viewport; Reset and Refresh inventory measured within
-  bounds.
-- 1280x800 CDP viewport: client/scroll width `1280/1280`, overflow false, no
-  button outside viewport; desktop control geometry preserved.
-- Isolated local-backend browser flow: one run and 36 committed rows displayed;
-  Download JSON returned 28,804 bytes and the UI reported "JSON download
-  started" with no error. Headless Chrome received all bytes but canceled its
-  download before writing a file; disk persistence remains unverified.
-- No lifecycle mutation was sent. Local frontend :3100 and backend :19001 were
-  task-owned and are stopped; ports were verified clear.
+- Chart branch's isolated checks: 29/29 tests, typecheck, lint, and build passed;
+  its screenshots are mock evidence, not telemetry proof.
+- K003 gates: 28/28 tests, typecheck, build, and contract 75/75; lint has one
+  pre-existing verifier warning.
+- Backend source inspection confirms `run.seq` increments on every processed
+  step and on state-changing controls. The existing `shouldApplyUpdate` accepts
+  equal sequence responses; chart buffer identity also includes run, sequence,
+  and simulated time.
+- Real browser telemetry integration passed on a task-owned scratch run:
+  office `168 W`/`0.006066666666666666 kWh` matched chart `#15` `168 W`/
+  `0.0061 kWh`; supported meeting light measured `72 W` on and `0 W` off;
+  pause froze `2025-12-31T18:32:10Z`; reset created a new run and one `#0`
+  sample. True 375x812 CDP width was `375/375` with no overflow.
+- Combined current-tree checks: 42/42 tests, typecheck/build passed, lint has
+  one pre-existing verifier warning, contract 75/75. K003 export browser flow
+  was rechecked with the chart mounted; headless disk persistence remains
+  unclaimed.
+- Public deployed backend/frontend remains unverified for this integration;
+  do not claim deployment until publication and remote checks complete.
 
-## files changed so far
+## files and safety
 
-- `app/lib/historical-export.ts`
-- `app/components/historical-export.tsx`
-- `app/lib/__tests__/historical-export.test.mjs`
-- `app/components/{sim-live,lifecycle-controls,office-map,clocks,connection-panel}.tsx`
-- `app/page.tsx`, `app/globals.css`, `package.json`
-- K003 evidence and continuity/README documentation (in progress)
+Expected task-owned additions/changes include chart components, chart buffer and
+tests, `SimLive`/`OfficeMap` integration, package test glob, and continuity/
+evidence docs. No contract, deployment config, environment, backend mutation,
+production database, or public simulator mutation is authorized.
 
-No dependency, lockfile, contract, deployment-config, environment, production
-database, or deployment setting was changed.
+All integration testing must use a scratch database/task-owned processes. Stop
+after chart integration and K003 publication; do not start K004 or unrelated
+feature work.
 
 ## exact next action
 
-Finalize K003 evidence/handoff/continuity, rerun all gates after the final diff,
-inspect staged files, commit and push only frontend K003 files, then verify the
-remote hash. Do not begin K004.
+Inspect the final staged merge, commit normally, push the frontend and backend
+K003/integration commits, verify both remote hashes, and report publication
+versus observed deployment separately. Do not start K004.

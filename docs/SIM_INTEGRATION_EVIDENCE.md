@@ -1,0 +1,128 @@
+# SIM-INTEGRATION evidence — live chart mounting
+
+- **Developer:** Kishore Kumar
+- **Agent:** K-A — OpenCode
+- **Assignment:** SIM-INTEGRATION — chart addition
+- **Chart source:** `9fc0f79f3082929cd67c475bc4b1902543632090`
+  (`kishore/sim-chart-01`, based on `dbcbee9`)
+- **K003 preserved commit:** `c4b319d`
+- **Status:** local integration verification complete; final combined gates and
+  publication pending
+- **Deployment:** not claimed; the public deployment was not mutated
+
+## Integration boundary
+
+`LiveCharts` is mounted in `SimLive` immediately below `OfficeMap` and before
+`HistoricalExportPanel`. It receives the existing `sim` state and `stale` flag;
+there is no chart-specific HTTP polling loop. `OfficeMap` now reports the actual
+selected room and selected device to `SimLive`. The chart is therefore bound to
+the same authoritative stream as clocks, lifecycle controls, readings, and
+K003 export.
+
+The device scope is visibly disabled as **Device: select in map** until the
+user presses **Chart device** for a real inventory device. Room and device
+selection never mutate simulator state.
+
+## Telemetry semantics
+
+- Backend source inspection confirms `run.seq` increments in `stepOnce` for
+  every processed engine step and on state-changing controls. The existing
+  `shouldApplyUpdate` accepts equal sequence responses, while the chart sample
+  key includes run, sequence, simulated time, stale state, and selected scope.
+- The bounded buffer retains up to 600 samples **per scope** and now retains all
+  observed devices, so changing scope does not erase another scope's history.
+  Run changes clear all series.
+- Same-time higher-sequence updates replace the current point. Equal-sequence
+  stale/fresh transitions update status without creating a duplicate time point.
+- Missing state entries are explicit `null` gaps, never fabricated zeroes.
+  Unexpected cumulative-energy decreases are preserved, not clamped.
+- Chart labels say **Sampled min/max**. Long/high-speed windows include an
+  Asia/Kolkata date plus time when the sample window crosses days; the table
+  always includes date context. Reduced-motion classes disable pulse/spin.
+- Room/device selection, run reset, and scope changes do not reset the buffer;
+  only a real `run_id` change does.
+
+## Polling/lifecycle correction
+
+Two integration issues found during browser verification were corrected without
+adding another loop:
+
+1. `OfficeMap.refresh` no longer depends on inventory state, preventing a
+   successful refresh from recreating its effect and causing an inventory
+   request loop.
+2. `SimLive` defers its initial forced poll by 50 ms so the effect/StrictMode
+   cycle settles before the first request. The existing single-flight,
+   visibility-aware, backoff-aware polling loop remains authoritative.
+
+The existing lifecycle controls, reset behavior, device commands, K003 export
+panel, `/sim` base, and responsive card layout remain intact.
+
+## Isolated local browser verification
+
+A task-owned scratch SQLite database was served on `127.0.0.1:19001`; the
+current frontend production build ran on owned port `3100`. Chrome DevTools
+request interception rewrote the committed public `/sim` requests to that local
+backend. No public simulator command or database was touched.
+
+Desktop run (1280px):
+
+```text
+old run: run-20260924T221445Z-8d419012
+live sequence: 15; paused sequence: 15
+backend office: 168 W, 0.006066666666666666 kWh
+chart latest row: #15, 168 W, 0.0061 kWh, paused
+room selection: Meeting room
+device selection: Lighting group / dev-meeting-light
+device on: 72 W; chart row #16 = 72 W
+device off: 0 W; chart row #17 = 0 W
+pause check: 2025-12-31T18:32:10Z before/after 1.6 s — frozen
+reset: response/state agreed on new run run-20260924T221511Z-d680369c
+        (subsequent scratch run IDs are intentionally ephemeral)
+```
+
+The reset DOM contained only the new run's initial `#0` sample, demonstrating
+that the chart buffer reset with the run. The actual selected-device rows were
+read after the scope settled; the immediate click diagnostic can capture the
+previous office render for one React turn and is not used as evidence.
+
+Mobile run (true CDP `375x812`, not a cropped desktop screenshot):
+
+```text
+client/scroll width: 375 / 375
+horizontal overflow: false
+chart scope button right edges: <= 338px
+```
+
+The current-build screenshots used for inspection are temporary artifacts:
+
+- `C:\Users\kdon7\AppData\Local\Temp\opencode\k003-chart-live.png`
+- `C:\Users\kdon7\AppData\Local\Temp\opencode\k003-chart-mobile.png`
+
+They are not committed product screenshots. The chart branch's old mock
+screenshots were removed from the merge; mock images are not telemetry proof.
+
+## Combined checks
+
+The latest completed runs before final publication are:
+
+```text
+npm test                    42 passed, 0 failed
+npm run typecheck           passed
+npm run lint                0 errors, 1 pre-existing verifier warning
+npm run build               passed
+npm run verify:contract     75/75 (contract unchanged)
+```
+
+The final post-documentation run repeated these gates successfully. The K003
+export browser flow was also rechecked against the scratch backend; the export
+panel remained present and the existing headless download limitation is
+unchanged (response bytes were received, but Save As persistence is not
+claimed).
+
+## Not claimed
+
+No claim is made for public deployment, public CORS/download behavior, real
+production telemetry, keyboard traversal, offline recovery, or a future
+SIM-VIS-01 illustrated-map redesign. The chart is mounted below the current map
+and can be relocated when that separate design branch is ready. K004 and
+unrelated feature work remain out of scope.

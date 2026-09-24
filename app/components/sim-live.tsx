@@ -10,7 +10,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Clocks from "./clocks";
 import HistoricalExportPanel from "./historical-export";
 import LifecycleControls, { type PendingOp } from "./lifecycle-controls";
-import OfficeMap from "./office-map";
+import OfficeMap, { type OfficeSelection } from "./office-map";
+import LiveCharts from "./charts/live-charts";
 import {
   POLL_INTERVAL_MS,
   STATE_TIMEOUT_MS,
@@ -41,6 +42,12 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
   const [pendingOp, setPendingOp] = useState<PendingOp>(null);
   const [devicePendingId, setDevicePendingId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [chartSelection, setChartSelection] = useState<OfficeSelection>({
+    roomId: null,
+    roomName: null,
+    deviceId: null,
+    deviceName: null,
+  });
 
   const tracked = useRef<TrackedState>({ run_id: null, seq: null });
   const failCount = useRef(0);
@@ -228,8 +235,8 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
     mounted.current = true;
     // Defer past the effect body (same pattern as the other panels).
     const start = setTimeout(() => {
-      void poll(true); // initial fetch
-    }, 0);
+      void poll(true); // initial fetch after the effect/StrictMode cycle settles
+    }, 50);
     const timer = setInterval(() => {
       void poll();
     }, POLL_INTERVAL_MS);
@@ -275,6 +282,17 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
     },
     [runCommand],
   );
+
+  const handleSelectionChange = useCallback((selection: OfficeSelection) => {
+    setChartSelection(selection);
+  }, []);
+
+  const chartRoom = chartSelection.roomId
+    ? { room_id: chartSelection.roomId, name: chartSelection.roomName ?? chartSelection.roomId }
+    : null;
+  const chartDevice = chartSelection.deviceId
+    ? { device_id: chartSelection.deviceId, name: chartSelection.deviceName ?? chartSelection.deviceId }
+    : null;
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
@@ -363,6 +381,14 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         mutateDisabled={mutateDisabled}
         devicePendingId={devicePendingId}
         onDeviceCommand={handleDeviceCommand}
+        onSelectionChange={handleSelectionChange}
+      />
+
+      <LiveCharts
+        state={sim}
+        isStale={stale}
+        selectedRoom={chartRoom}
+        selectedDevice={chartDevice}
       />
 
       <HistoricalExportPanel

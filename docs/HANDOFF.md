@@ -22,10 +22,10 @@
   recreates its own effect/request loop, and the initial forced state poll is
   deferred 50 ms for the effect/StrictMode cycle. No second polling loop exists.
 - Final publication/read-only observation passed: backend remote `5cb824d`,
-  frontend remote `53d5bc9` (merge `bacc8ff`, review `a47204d`, docs). The
-  deployed chart exposed the expected pressed/disabled scope states and no
-  375px overflow. No public mutation was made. K003 sections below are
-  preserved historical continuity.
+  frontend evidence/continuation `53d5bc9` plus the current final handoff
+  commit (merge `bacc8ff`, review `a47204d`). The deployed chart exposed the
+  expected pressed/disabled scope states and no 375px overflow. No public
+  mutation was made. K003 sections below are preserved historical continuity.
 
 ## K003 historical addendum (2026-09-25, Kishore | K-A — OpenCode)
 

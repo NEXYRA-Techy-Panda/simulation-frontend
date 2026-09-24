@@ -128,12 +128,13 @@ claimed).
 ## Publication and observed deployment
 
 Publication was performed normally after the green gates. The implementation
-merge is `bacc8ff`, review fixes are `a47204d`, and the final documentation
-commit/remote head is `53d5bc9`.
+merge is `bacc8ff`, review fixes are `a47204d`, and the evidence/continuation
+publication is `53d5bc9`; the final handoff commit is the current frontend
+`origin/main` head.
 
 ```text
 simulation-backend origin/main: 5cb824dc581495a9d1ea9db114cac6823f2e7c1a
-simulation-frontend origin/main: 53d5bc9 (merge bacc8ff + review a47204d + docs)
+simulation-frontend origin/main: 53d5bc9 + final handoff commit (current head)
 ```
 
 Read-only public observations after publication:

@@ -487,8 +487,9 @@ correction entry; do not rewrite history.
 
 ## 2026-09-25 04:10:00 +05:30 (IST) — SIM-INTEGRATION review fixes published (Kishore | K-A — OpenCode)
 
-- Pushed follow-up `a47204d` and final continuity commit; frontend remote is
-  `53d5bc9` (implementation merge `bacc8ff`). Backend remote remains `5cb824d`.
+- Pushed follow-up `a47204d` and evidence/continuation publication
+  `53d5bc9`; the final handoff commit is the current frontend remote head
+  (implementation merge `bacc8ff`). Backend remote remains `5cb824d`.
 - Re-observed the deployed frontend after propagation: chart state rendered,
   Office/Graphs pressed states were exposed, device scope stayed disabled until
   selection, and true 375px width had no overflow or out-of-viewport buttons.

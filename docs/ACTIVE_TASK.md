@@ -73,9 +73,10 @@ Review status: pending (never self-approved).
   typecheck/build passed, lint has one pre-existing verifier warning, contract
   75/75. K003 export remains mounted; headless disk persistence remains
   unclaimed.
-- Final remote state: backend `5cb824d`, frontend `53d5bc9` (implementation
-  merge `bacc8ff`, review fixes `a47204d`). Public health/runs/export and
-  deployed chart/375px observations are recorded; no mutation was sent.
+- Final remote state: backend `5cb824d`, frontend evidence/continuation
+  `53d5bc9` plus the current final handoff commit (implementation merge
+  `bacc8ff`, review fixes `a47204d`). Public health/runs/export and deployed
+  chart/375px observations are recorded; no mutation was sent.
 
 ## files and safety
 

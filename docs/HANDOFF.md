@@ -2,7 +2,7 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **P009 S9/K1-UI** (clocks, state, controls, Agent A —
+- Current layer: **P011 F6-frontend** (Kishore handoff, Agent A —
   OpenCode) — status **completed**, review **pending**. Contract: **1.0.1
   authoritative, read-only**.
 - P005 S10-A addendum (completed, review pending): office-map screen —
@@ -16,6 +16,11 @@
   HTTP-200 markup; real backend down (pending); browser interaction
   unverified. Details in [P005_S10_A_EVIDENCE.md](P005_S10_A_EVIDENCE.md).
   Auditor-frontend untouched. History preserved.
+- P011 F6-frontend addendum (completed, review pending): created
+  [KISHORE_FRONTEND_HANDOFF.md](KISHORE_FRONTEND_HANDOFF.md) (ownership,
+  baseline, setup, code map, assumptions, outstanding verification, ordered
+  remaining work, onboarding prompt). Docs only; link/path/command review
+  green. Full cross-project F6 gate NOT claimed. History preserved.
 - P009 S9/K1-UI addendum (completed, review pending): analogue+digital clocks
   from one sim_time_utc (Asia/Kolkata), lifecycle status, 1–1000× selector,
   start/pause/resume/reset, ~1/s polling (timeout/abort/no-overlap/seq

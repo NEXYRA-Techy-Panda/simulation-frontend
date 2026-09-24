@@ -316,3 +316,19 @@ correction entry; do not rewrite history.
 - 3 questions for Claude Code recorded in P009 evidence (start/resume empty bodies, no-run speed persistence, upcoming state fields).
 - Next action: commit, push main, verify remote hash; return P009 evidence. Stop after P009.
 - Commit references: P005 pushed; P009 recorded after push.
+---
+
+## 2026-09-24 20:41:35 +05:30 (IST) - P011 started (actual, Agent A - OpenCode)
+
+- P009 accepted for implementation based on its evidence. Distinction: live simulator integration and browser interaction remain unverified - not called passed.
+- Docs-only assignment in this repo: Kishore handoff. No simulator features. No writes to siblings/backends/contracts/parent.
+- Startup: AGENTS.md absent; full context + P009 evidence + API read; main clean at expected baseline cc2fc8f, fetch clean.
+- Next action: write docs/KISHORE_FRONTEND_HANDOFF.md, update continuity, verify, commit, push.
+- Review status: pending. P011 commit: none yet.
+---
+
+## 2026-09-24 20:55:00 +05:30 (IST) - P011 completed (actual, Agent A - OpenCode)
+
+- docs/KISHORE_FRONTEND_HANDOFF.md written (ownership, baseline, setup, code map, assumptions, outstanding verification, ordered remaining work, onboarding prompt). Docs only; link/path/command review green. F6 gate NOT claimed.
+- Next action: commit, push main, verify remote hash; return P011 evidence. Stop after P011.
+- Commit references: P009 pushed; P011 recorded after push.

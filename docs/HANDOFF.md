@@ -9,8 +9,11 @@
   disabled until **Chart device** is selected; scope changes retain bounded
   per-scope history. Run changes alone clear the buffer.
 - Backend source confirms sequence advancement per processed step/control.
-  Buffer tests cover equal-seq stale/fresh transitions, all-device retention,
-  null gaps, energy decreases, run reset, boundedness, and date context.
+  Review follow-up `a47204d` makes stale intervals explicit graph gaps, scales
+  energy from the retained maximum, hides the old run during handoff, propagates
+  human-readable scope names, validates room/device membership, exposes missing
+  selected scopes, and adds focus/pressed state. Buffer tests now cover these
+  semantics, energy-axis decreases, run reset, boundedness, and date context.
 - Isolated scratch browser verification matched backend office power/energy,
   responded to a supported device switch (72 W on / 0 W off), froze simulated
   time on pause, reset to a new run/series, and showed no 375px overflow.
@@ -18,10 +21,10 @@
 - Two safe integration corrections were made: inventory refresh no longer
   recreates its own effect/request loop, and the initial forced state poll is
   deferred 50 ms for the effect/StrictMode cycle. No second polling loop exists.
-- Final combined gates passed and normal publication completed: backend remote
-  `5cb824d`, frontend remote `c82e7b9` (implementation merge `bacc8ff`). Read-only public health/runs/export and
-  deployed frontend chart/375px checks succeeded; no public mutation was made.
-  K003 sections below are preserved historical continuity.
+- Initial publication/read-only observation passed: backend remote `5cb824d`,
+  frontend remote `c82e7b9` (merge `bacc8ff`). Review follow-up `a47204d` is
+  green locally and awaits normal push/re-observation. No public mutation was
+  made. K003 sections below are preserved historical continuity.
 
 ## K003 historical addendum (2026-09-25, Kishore | K-A — OpenCode)
 

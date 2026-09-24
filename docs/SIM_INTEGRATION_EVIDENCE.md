@@ -33,10 +33,15 @@ selection never mutate simulator state.
 - The bounded buffer retains up to 600 samples **per scope** and now retains all
   observed devices, so changing scope does not erase another scope's history.
   Run changes clear all series.
-- Same-time higher-sequence updates replace the current point. Equal-sequence
-  stale/fresh transitions update status without creating a duplicate time point.
+- Same-time higher-sequence updates replace the current point. Stale polls are
+  normalized to explicit null gaps; recovery appends after the gap instead of
+  reconnecting the line across an outage.
 - Missing state entries are explicit `null` gaps, never fabricated zeroes.
-  Unexpected cumulative-energy decreases are preserved, not clamped.
+  Unexpected cumulative-energy decreases are preserved, not clamped; the
+  energy axis uses the maximum retained sample, not only the latest value.
+- A new run hides the prior buffer until the effect has ingested/cleared it.
+  Selected human-readable names are shown on chart cards, and inventory refresh
+  only preserves a device that still belongs to the selected room.
 - Chart labels say **Sampled min/max**. Long/high-speed windows include an
   Asia/Kolkata date plus time when the sample window crosses days; the table
   always includes date context. Reduced-motion classes disable pulse/spin.
@@ -107,7 +112,7 @@ screenshots were removed from the merge; mock images are not telemetry proof.
 The latest completed runs before final publication are:
 
 ```text
-npm test                    42 passed, 0 failed
+npm test                    43 passed, 0 failed
 npm run typecheck           passed
 npm run lint                0 errors, 1 pre-existing verifier warning
 npm run build               passed
@@ -122,11 +127,12 @@ claimed).
 
 ## Publication and observed deployment
 
-Publication was performed normally after the green gates:
+Publication was performed normally after the green gates. The follow-up review
+fix commit is `a47204d`; final remote hashes are recorded after its publication.
 
 ```text
 simulation-backend origin/main: 5cb824dc581495a9d1ea9db114cac6823f2e7c1a
-simulation-frontend origin/main: c82e7b9 (implementation merge bacc8ff + deployment record)
+simulation-frontend origin/main: pending publication of a47204d
 ```
 
 Read-only public observations after publication:

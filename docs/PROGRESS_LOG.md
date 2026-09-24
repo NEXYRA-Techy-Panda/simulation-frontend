@@ -468,3 +468,17 @@ correction entry; do not rewrite history.
 - No public lifecycle/device/reset/database mutation was sent. Interactive
   deployed persistence and unrelated accessibility/recovery claims remain
   distinct from local verification. K004 remains out of scope.
+
+---
+
+## 2026-09-25 04:00:00 +05:30 (IST) — SIM-INTEGRATION review follow-up (Kishore | K-A — OpenCode)
+
+- Independent review found no high-severity blocker. Follow-up commit `a47204d`
+  closes medium gaps: stale intervals become explicit graph gaps; energy scale
+  uses retained maximum; old-run samples are gated during handoff; selected
+  scope names, room membership, missing-scope messaging, focusability, and
+  `aria-pressed` state are corrected.
+- Pure tests grow to **43/43**; typecheck, lint (one pre-existing warning),
+  build, and contract 75/75 pass. The initial deployed revision was observed
+  before this follow-up; push/re-observation remains pending. No public mutation
+  was performed. K004 remains out of scope.

@@ -14,9 +14,9 @@ Kishore | K-A — OpenCode.
 
 ## status
 
-completed — K003 is preserved in commit `c4b319d`; chart branch `9fc0f79`
-is integrated, current-build telemetry/selection verification is recorded, and
-publication/read-only deployment checks are complete.
+in_progress — K003 and the chart merge are preserved; review follow-up `a47204d`
+closes medium telemetry/accessibility gaps and is green locally. Normal push
+and post-push read-only deployment observation remain.
 
 Review status: pending (never self-approved).
 
@@ -69,12 +69,13 @@ Review status: pending (never self-approved).
   `0.0061 kWh`; supported meeting light measured `72 W` on and `0 W` off;
   pause froze `2025-12-31T18:32:10Z`; reset created a new run and one `#0`
   sample. True 375x812 CDP width was `375/375` with no overflow.
-- Combined current-tree checks: 42/42 tests, typecheck/build passed, lint has
-  one pre-existing verifier warning, contract 75/75. K003 export browser flow
-  was rechecked with the chart mounted; headless disk persistence remains
+- Combined current-tree checks after review fixes: 43/43 tests,
+  typecheck/build passed, lint has one pre-existing verifier warning, contract
+  75/75. K003 export remains mounted; headless disk persistence remains
   unclaimed.
-- Public deployed backend/frontend remains unverified for this integration;
-  do not claim deployment until publication and remote checks complete.
+- The prior frontend publication was observed, but follow-up `a47204d` is not yet
+  published. Do not claim the review fixes are deployed until the remote hash
+  and read-only frontend observation are refreshed.
 
 ## files and safety
 
@@ -89,6 +90,6 @@ feature work.
 
 ## exact next action
 
-Final state is published and observed: backend remote `5cb824d`, frontend
-remote `c82e7b9` (implementation merge `bacc8ff`); public backend health/runs/export and the deployed frontend
-chart/375px layout were read-only checked. Do not start K004.
+Push review follow-up `a47204d`, update the continuity/deployment record with
+its remote hash, and repeat read-only deployed frontend chart/375px checks.
+Do not start K004.

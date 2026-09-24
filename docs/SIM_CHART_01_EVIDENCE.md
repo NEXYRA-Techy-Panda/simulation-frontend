@@ -32,7 +32,7 @@ SIM-CHART-01 delivers continuous scrolling, ECG-style monitoring graphs for live
 | `app/components/charts/power-chart.tsx` | Live power trend SVG chart with Y-axis auto-ticks, X-axis timestamps, latest-point beacon, and hover tooltips. |
 | `app/components/charts/energy-chart.tsx` | Cumulative energy SVG chart with dedicated kWh scale and monotonic trend display. |
 | `app/components/charts/accessible-table.tsx` | Screen-reader accessible table of recent telemetry readings. |
-| `app/lib/__tests__/chart-buffer.test.mjs` | 14 focused unit tests covering buffer boundedness, timestamps, run transitions, gaps, stale status, scope retention, date context, energy decreases, and zero/flat-line safety. |
+| `app/lib/__tests__/chart-buffer.test.mjs` | 15 focused unit tests covering buffer boundedness, timestamps, run transitions, stale gaps/recovery, scope retention, date context, energy decreases/axis bounds, and zero/flat-line safety. |
 
 ---
 
@@ -86,7 +86,7 @@ images do not prove simulator integration.
 ## 6. Verification Results
 
 - `npm test`: **29 passed**, 0 failed on the isolated chart branch; the merged
-  current tree reaches **42 passed** with the K003 and chart suites together.
+  current tree reaches **43 passed** with the K003 and chart suites together.
 - `npm run typecheck`: **Clean** (0 errors).
 - `npm run lint`: **0 errors**, 1 pre-existing warning.
 - `npm run build`: **Exit 0** (compiled static routes).

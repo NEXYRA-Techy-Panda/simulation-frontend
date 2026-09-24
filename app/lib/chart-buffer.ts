@@ -1,0 +1,430 @@
+// Bounded telemetry buffer for live simulation graphs (SIM-CHART-01).
+// Pure data structures and math for scrolling ECG-style live telemetry.
+// Type-strippable TypeScript syntax for node:test compatibility.
+
+import type { Lifecycle, SimState } from "./sim-state";
+
+export type ScopeType = "office" | "room" | "device";
+
+export interface ChartSample {
+  sim_time_utc: string;
+  sim_time_ms: number;
+  seq: number;
+  power_w: number | null;
+  energy_kwh: number | null;
+  status: Lifecycle | "stale" | "unknown";
+}
+
+export interface ScopeSeries {
+  scope: ScopeType;
+  id: string; // "office", or room_id, or device_id
+  name: string;
+  samples: ChartSample[];
+  lastSeq: number;
+  lastTimeUtc: string | null;
+  latestPowerW: number | null;
+  latestEnergyKwh: number | null;
+  minPowerW: number | null;
+  maxPowerW: number | null;
+  hasGaps: boolean;
+}
+
+export interface TelemetryBuffer {
+  runId: string | null;
+  maxSamples: number;
+  series: Map<string, ScopeSeries>;
+}
+
+export const DEFAULT_MAX_SAMPLES = 600;
+
+export function makeScopeKey(scope: ScopeType, id: string): string {
+  return `${scope}:${id}`;
+}
+
+export function createTelemetryBuffer(maxSamples: number = DEFAULT_MAX_SAMPLES): TelemetryBuffer {
+  return {
+    runId: null,
+    maxSamples: Math.max(2, maxSamples),
+    series: new Map<string, ScopeSeries>(),
+  };
+}
+
+/** Formats a UTC ISO timestamp as HH:mm:ss in Asia/Kolkata (deterministic). */
+export function formatKolkataTime(isoUtc: string): string {
+  const d = new Date(isoUtc);
+  if (isNaN(d.getTime())) return "--:--:--";
+  // Asia/Kolkata is UTC+05:30 fixed
+  const kolkataOffsetMs = (5 * 60 + 30) * 60 * 1000;
+  const kolkataDate = new Date(d.getTime() + kolkataOffsetMs);
+  const hours = String(kolkataDate.getUTCHours()).padStart(2, "0");
+  const minutes = String(kolkataDate.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(kolkataDate.getUTCSeconds()).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+/** Ingests an authoritative SimState sample into the telemetry buffer. */
+export function ingestSimState(
+  buffer: TelemetryBuffer,
+  state: SimState,
+  isStale: boolean = false,
+  selectedRoomId?: string | null,
+  selectedDeviceId?: string | null,
+  names?: { rooms?: Record<string, string>; devices?: Record<string, string> }
+): TelemetryBuffer {
+  const currentRunId = state.run_id ?? null;
+
+  // Run change starts a fresh series for all scopes
+  if (buffer.runId !== currentRunId) {
+    buffer.runId = currentRunId;
+    buffer.series.clear();
+    if (!currentRunId) {
+      return buffer;
+    }
+  }
+
+  if (!state.sim_time_utc || state.seq === null) {
+    return buffer;
+  }
+
+  const timeUtc = state.sim_time_utc;
+  const timeMs = new Date(timeUtc).getTime();
+  if (isNaN(timeMs)) return buffer;
+
+  const seq = state.seq;
+  const status = isStale ? "stale" : state.status;
+
+  // 1. Office scope
+  const officePower = state.office?.power_w ?? null;
+  const officeEnergy = state.office?.energy_kwh ?? null;
+  appendScopeSample(buffer, "office", "office", "Whole Office", {
+    sim_time_utc: timeUtc,
+    sim_time_ms: timeMs,
+    seq,
+    power_w: officePower,
+    energy_kwh: officeEnergy,
+    status,
+  });
+
+  // 2. Room scopes (all active rooms in state)
+  for (const r of state.rooms) {
+    const roomName = names?.rooms?.[r.room_id] ?? r.room_id;
+    appendScopeSample(buffer, "room", r.room_id, roomName, {
+      sim_time_utc: timeUtc,
+      sim_time_ms: timeMs,
+      seq,
+      power_w: r.power_w ?? null,
+      energy_kwh: r.energy_kwh ?? null,
+      status,
+    });
+  }
+
+  // 3. Device scopes (track devices present in state)
+  for (const d of state.devices) {
+    // Only buffer device if it's currently selected or to bounded set
+    if (selectedDeviceId && d.device_id !== selectedDeviceId) {
+      continue;
+    }
+    const devName = names?.devices?.[d.device_id] ?? d.device_id;
+    appendScopeSample(buffer, "device", d.device_id, devName, {
+      sim_time_utc: timeUtc,
+      sim_time_ms: timeMs,
+      seq,
+      power_w: d.power_w ?? null,
+      energy_kwh: d.energy_kwh ?? null,
+      status,
+    });
+  }
+
+  // If a selected room or device was not in state, record an explicit null gap point if series exists
+  if (selectedRoomId) {
+    const roomFound = state.rooms.some((r) => r.room_id === selectedRoomId);
+    if (!roomFound) {
+      const roomKey = makeScopeKey("room", selectedRoomId);
+      if (buffer.series.has(roomKey)) {
+        appendScopeSample(buffer, "room", selectedRoomId, names?.rooms?.[selectedRoomId] ?? selectedRoomId, {
+          sim_time_utc: timeUtc,
+          sim_time_ms: timeMs,
+          seq,
+          power_w: null,
+          energy_kwh: null,
+          status,
+        });
+      }
+    }
+  }
+
+  if (selectedDeviceId) {
+    const devFound = state.devices.some((d) => d.device_id === selectedDeviceId);
+    if (!devFound) {
+      const devKey = makeScopeKey("device", selectedDeviceId);
+      if (buffer.series.has(devKey)) {
+        appendScopeSample(buffer, "device", selectedDeviceId, names?.devices?.[selectedDeviceId] ?? selectedDeviceId, {
+          sim_time_utc: timeUtc,
+          sim_time_ms: timeMs,
+          seq,
+          power_w: null,
+          energy_kwh: null,
+          status,
+        });
+      }
+    }
+  }
+
+  return buffer;
+}
+
+function appendScopeSample(
+  buffer: TelemetryBuffer,
+  scope: ScopeType,
+  id: string,
+  name: string,
+  sample: ChartSample
+): void {
+  const key = makeScopeKey(scope, id);
+  let series = buffer.series.get(key);
+
+  if (!series) {
+    series = {
+      scope,
+      id,
+      name,
+      samples: [],
+      lastSeq: -1,
+      lastTimeUtc: null,
+      latestPowerW: sample.power_w,
+      latestEnergyKwh: sample.energy_kwh,
+      minPowerW: sample.power_w,
+      maxPowerW: sample.power_w,
+      hasGaps: sample.power_w === null || sample.energy_kwh === null,
+    };
+    buffer.series.set(key, series);
+  }
+
+  // Same-time update with newer seq: update current point in place
+  if (sample.sim_time_utc === series.lastTimeUtc && series.samples.length > 0) {
+    if (sample.seq > series.lastSeq) {
+      series.samples[series.samples.length - 1] = sample;
+      series.lastSeq = sample.seq;
+      series.latestPowerW = sample.power_w;
+      series.latestEnergyKwh = sample.energy_kwh;
+      recomputeExtrema(series);
+    }
+    return;
+  }
+
+  // Out-of-order or duplicate seq check: ignore if seq <= lastSeq
+  if (sample.seq <= series.lastSeq) {
+    return;
+  }
+
+  // Paused simulation without time progress: update status of latest point instead of adding fake elapsed time
+  if (
+    sample.status === "paused" &&
+    sample.sim_time_utc === series.lastTimeUtc &&
+    series.samples.length > 0
+  ) {
+    series.samples[series.samples.length - 1].status = "paused";
+    return;
+  }
+
+  // Add new sample
+  series.samples.push(sample);
+  series.lastSeq = sample.seq;
+  series.lastTimeUtc = sample.sim_time_utc;
+  series.latestPowerW = sample.power_w;
+  series.latestEnergyKwh = sample.energy_kwh;
+
+  if (sample.power_w === null || sample.energy_kwh === null) {
+    series.hasGaps = true;
+  }
+
+  // Bounded buffer eviction
+  if (series.samples.length > buffer.maxSamples) {
+    series.samples.splice(0, series.samples.length - buffer.maxSamples);
+  }
+
+  recomputeExtrema(series);
+}
+
+function recomputeExtrema(series: ScopeSeries): void {
+  let minP: number | null = null;
+  let maxP: number | null = null;
+  let hasGaps = false;
+
+  for (const s of series.samples) {
+    if (s.power_w === null) {
+      hasGaps = true;
+    } else {
+      if (minP === null || s.power_w < minP) minP = s.power_w;
+      if (maxP === null || s.power_w > maxP) maxP = s.power_w;
+    }
+  }
+
+  series.minPowerW = minP;
+  series.maxPowerW = maxP;
+  series.hasGaps = hasGaps;
+}
+
+export function getScopeSeries(
+  buffer: TelemetryBuffer,
+  scope: ScopeType,
+  id: string
+): ScopeSeries | null {
+  return buffer.series.get(makeScopeKey(scope, id)) ?? null;
+}
+
+export interface ChartBounds {
+  minVal: number;
+  maxVal: number;
+  currentVal: number | null;
+  minTimeMs: number;
+  maxTimeMs: number;
+  hasData: boolean;
+}
+
+export function calculateChartBounds(
+  samples: ChartSample[],
+  metric: "power" | "energy"
+): ChartBounds {
+  if (samples.length === 0) {
+    return {
+      minVal: 0,
+      maxVal: metric === "power" ? 100 : 1,
+      currentVal: null,
+      minTimeMs: 0,
+      maxTimeMs: 1,
+      hasData: false,
+    };
+  }
+
+  let minVal: number | null = null;
+  let maxVal: number | null = null;
+  let currentVal: number | null = null;
+  let minTimeMs = samples[0].sim_time_ms;
+  let maxTimeMs = samples[samples.length - 1].sim_time_ms;
+
+  for (const s of samples) {
+    const val = metric === "power" ? s.power_w : s.energy_kwh;
+    if (val !== null) {
+      if (minVal === null || val < minVal) minVal = val;
+      if (maxVal === null || val > maxVal) maxVal = val;
+      currentVal = val;
+    }
+    if (s.sim_time_ms < minTimeMs) minTimeMs = s.sim_time_ms;
+    if (s.sim_time_ms > maxTimeMs) maxTimeMs = s.sim_time_ms;
+  }
+
+  // Handle all nulls
+  if (minVal === null || maxVal === null) {
+    return {
+      minVal: 0,
+      maxVal: metric === "power" ? 100 : 1,
+      currentVal: null,
+      minTimeMs,
+      maxTimeMs: maxTimeMs === minTimeMs ? minTimeMs + 60000 : maxTimeMs,
+      hasData: false,
+    };
+  }
+
+  // Time range safety
+  if (maxTimeMs === minTimeMs) {
+    maxTimeMs = minTimeMs + 60000; // default 1 min window
+  }
+
+  // Value range safety: avoid divide-by-zero for flat lines
+  if (metric === "power") {
+    // Power baseline is 0 unless minVal is high
+    const yMin = 0;
+    const yMax = maxVal === 0 ? 100 : Math.max(maxVal * 1.15, maxVal + 10);
+    return {
+      minVal: yMin,
+      maxVal: yMax,
+      currentVal,
+      minTimeMs,
+      maxTimeMs,
+      hasData: true,
+    };
+  } else {
+    // Energy: cumulative non-negative
+    const yMin = 0;
+    const yMax = maxVal === 0 ? 0.05 : maxVal * 1.15;
+    return {
+      minVal: yMin,
+      maxVal: yMax,
+      currentVal,
+      minTimeMs,
+      maxTimeMs,
+      hasData: true,
+    };
+  }
+}
+
+export interface SvgPathResult {
+  segments: string[]; // List of SVG path data "M ... L ..." breaking at null gaps
+  points: Array<{ x: number; y: number; val: number; timeUtc: string }>;
+  latestPoint: { x: number; y: number; val: number } | null;
+  hasGaps: boolean;
+}
+
+/** Generates straight SVG polyline segments for crisp ECG-style visualization without fake curve overshoot. */
+export function generateSvgPath(
+  samples: ChartSample[],
+  metric: "power" | "energy",
+  width: number,
+  height: number,
+  padding: { top: number; right: number; bottom: number; left: number },
+  bounds?: ChartBounds
+): SvgPathResult {
+  const chartBounds = bounds ?? calculateChartBounds(samples, metric);
+  const plotWidth = Math.max(10, width - padding.left - padding.right);
+  const plotHeight = Math.max(10, height - padding.top - padding.bottom);
+
+  const timeRange = chartBounds.maxTimeMs - chartBounds.minTimeMs;
+  const valRange = chartBounds.maxVal - chartBounds.minVal;
+
+  const segments: string[] = [];
+  const points: Array<{ x: number; y: number; val: number; timeUtc: string }> = [];
+  let currentSegment: string[] = [];
+  let latestPoint: { x: number; y: number; val: number } | null = null;
+  let hasGaps = false;
+
+  for (let i = 0; i < samples.length; i++) {
+    const s = samples[i];
+    const val = metric === "power" ? s.power_w : s.energy_kwh;
+
+    if (val === null) {
+      hasGaps = true;
+      if (currentSegment.length > 0) {
+        segments.push(currentSegment.join(" "));
+        currentSegment = [];
+      }
+      continue;
+    }
+
+    const tNorm = timeRange > 0 ? (s.sim_time_ms - chartBounds.minTimeMs) / timeRange : 1;
+    const vNorm = valRange > 0 ? (val - chartBounds.minVal) / valRange : 0;
+
+    const x = padding.left + tNorm * plotWidth;
+    const y = padding.top + (1 - vNorm) * plotHeight;
+
+    points.push({ x, y, val, timeUtc: s.sim_time_utc });
+    latestPoint = { x, y, val };
+
+    if (currentSegment.length === 0) {
+      currentSegment.push(`M ${x.toFixed(1)} ${y.toFixed(1)}`);
+    } else {
+      currentSegment.push(`L ${x.toFixed(1)} ${y.toFixed(1)}`);
+    }
+  }
+
+  if (currentSegment.length > 0) {
+    segments.push(currentSegment.join(" "));
+  }
+
+  return {
+    segments,
+    points,
+    latestPoint,
+    hasGaps,
+  };
+}

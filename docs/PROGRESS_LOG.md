@@ -363,6 +363,31 @@ correction entry; do not rewrite history.
 - Backend half of K002 (run-scoped policy activation; migration `003_run_policy_activation`; 61/61 tests; real-HTTP reproduction) is recorded in `../simulation-backend/docs/K002_POLICY_TIMING_EVIDENCE.md`. No frontend runtime behaviour changed.
 - Browser verification: still NOT performed (no browser ability in session) - the K001 manual checklist in `docs/K001_KISHORE_ONBOARDING_EVIDENCE.md` S10 remains the outstanding item.
 - Files changed: created `.gitattributes`; updated `docs/HANDOFF.md`, `docs/ACTIVE_TASK.md`, this log. `.next/` remains git-ignored.
-- Review status: pending (no self-assigned approval). Commit references: simulation-frontend `906446e201e4b6bb3e53bf1d44c85be2c17a593d` (pushed, local == origin/main); the K002 `.gitattributes` is in `e227839`.
 - Next action: complete the manual browser checklist against a local backend run; the paired backend's next layer is the historical export endpoint. Do not start new simulator features until assigned.
-- Next action: complete the manual browser checklist against a local backend run and record the results; the backend policy-timing correction is the next recommended K-layer. Do not start simulator features until assigned.
+
+---
+
+## 2026-09-25 03:00:00 +05:30 (IST) — SIM-CHART-01 completed (Agent K-C — Antigravity Gemini)
+
+- Assignment: SIM-CHART-01 (Live simulator graphs, milestone 1 / 2). Owner: Kishore Kumar.
+- Branch: `kishore/sim-chart-01` in worktree `../simulation-frontend-charts`, based on clean committed `main` at `dbcbee9b935a3f6777f7a8bfca097d258e02e652`. Main branch was not modified.
+- Scope: Implemented isolated scrolling ECG-style live telemetry graphs (Live Power Trend in W/kW, Cumulative Energy Trend in kWh, scope toggles for Office, Selected Room, Selected Device, accessible recent-values data table).
+- Data Semantics:
+  - Bounded ring buffer capped at 600 samples per scope (`app/lib/chart-buffer.ts`).
+  - Strict sequence monotonicity (`seq <= lastSeq` discarded).
+  - Same-time updates update latest sample in-place without zero-duration duplicate steps.
+  - Missing readings remain `null` (gaps), never fabricated zeros.
+  - Paused state updates status without phantom horizontal time stretch.
+  - Formats horizontal time axis in `Asia/Kolkata` (`HH:mm:ss`).
+  - Recorded history adapter (`app/lib/history-adapter.ts`) distinguishes interval average from peak power.
+- Checks & Evidence:
+  - `npm test`: 29 passed, 0 failed (19 sim-state + 10 chart-buffer).
+  - `npm run typecheck`: clean exit 0.
+  - `npm run lint`: 0 errors, 1 pre-existing warning.
+  - `next build`: clean exit 0 (Webpack build for worktree junction compatibility).
+  - Isolated preview screenshots captured via headless Google Chrome:
+    - `docs/screenshots/chart-desktop-overview.png`
+    - `docs/screenshots/chart-mobile-375px.png`
+- Documentation: created `docs/SIM_CHART_01_EVIDENCE.md`; updated `docs/ACTIVE_TASK.md`, `docs/HANDOFF.md`, and this log.
+- Review status: pending (never self-assigned).
+- Next action (Milestone 2): OpenCode (K-A) to mount `LiveCharts` into `app/components/sim-live.tsx` beneath the SVG office floorplan and verify against live backend polling.

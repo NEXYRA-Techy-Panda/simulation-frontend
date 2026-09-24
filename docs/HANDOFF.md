@@ -2,7 +2,17 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **K002 / K1 — contract checkout portability and run-policy
+- Current layer: **SIM-CHART-01 — Live simulator graphs (Milestone 1 / 2)**
+  (Agent K-C — Antigravity Gemini) — status **completed**, review **pending**.
+  Implemented in isolated branch `kishore/sim-chart-01` in worktree
+  `../simulation-frontend-charts` (base `dbcbee9b935a3f6777f7a8bfca097d258e02e652`).
+  Delivers reusable live power (W/kW) and cumulative energy (kWh) scrolling SVG
+  charts, scope toggles for Office, Room, and Device, accessible table view,
+  bounded ring buffer with out-of-order and duplicate filtering, and recorded
+  history adapter. Tests: 29/29 passed; typecheck/lint clean; build exit 0;
+  headless Chrome visual screenshots in `docs/screenshots/`. Evidence:
+  `docs/SIM_CHART_01_EVIDENCE.md`.
+- Prior layer: **K002 / K1 — contract checkout portability and run-policy
   timing** (Agent K — Kishore's coding agent) — status **completed**, review
   **pending**. In this repository only checkout configuration (`.gitattributes`)
   and documentation changed; no app source, config, dependency, lockfile or

@@ -2,9 +2,20 @@
 
 ## 0. Continuity and current layer (F0.1, 2026-09-24)
 
-- Current layer: **P001 F4-A** (frontend health connections, Agent A —
-  OpenCode) — status **in_progress**, review **pending**. Contract: **1.0.1
+- Current layer: **P005 S10-A** (office map + inventory, Agent A —
+  OpenCode) — status **completed**, review **pending**. Contract: **1.0.1
   authoritative, read-only**.
+- P005 S10-A addendum (completed, review pending): office-map screen —
+  inventory loading/error/loaded/empty states + manual refresh, top-down SVG
+  keyed by five stable room IDs (corridor, labels, selectable regions,
+  keyboard + list access, focus ring), details panel (capacity as capacity,
+  nominal group power never multiplied, always-on badges, resolvable schedule
+  info, "Not available yet" for runtime data), stale labeling, selection
+  preserved across refresh, unknown rooms listed. Verified: 21/21 + 10/10
+  focused checks, 75/75 contract, typecheck/lint(0 errors)/build green,
+  HTTP-200 markup; real backend down (pending); browser interaction
+  unverified. Details in [P005_S10_A_EVIDENCE.md](P005_S10_A_EVIDENCE.md).
+  Auditor-frontend untouched. History preserved.
 - P001 F4-A addendum (completed, review pending): browser-side connection
   panel (`NEXT_PUBLIC_SIMULATION_BACKEND_URL` + `/api/v1/health`, 8 s timeout,
   abort on unmount, no duplicates/polling); states incl. not_initialized =

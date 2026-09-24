@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* SVG room regions: keyboard-focusable, visible focus ring. */
+.office-room {
+  cursor: pointer;
+}
+.office-room:focus {
+  outline: none;
+}
+.office-room:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}

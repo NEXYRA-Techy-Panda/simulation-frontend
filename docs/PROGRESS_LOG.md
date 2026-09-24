@@ -280,3 +280,20 @@ correction entry; do not rewrite history.
 - Real backend :4000 refused (integration pending); browser/CORS not verifiable in-session. Backend repos untouched. Review pending; no approval claimed.
 - Next action: commit, push main, verify remote hash; return P001 evidence. Stop after P001.
 - Commit references: F2-A pushed; P001 recorded after push.
+---
+
+## 2026-09-24 20:01:25 +05:30 (IST) - P005 S10-A started (actual, Agent A - OpenCode)
+
+- P001 accepted for implementation based on supplied evidence. Distinction recorded: actual browser/CORS and live backend verification remain outstanding.
+- Exclusive writer: simulation-frontend only. Auditor-frontend unchanged. No sibling/parent/contract writes; no backend processes started or stopped.
+- Startup: AGENTS.md absent; context + P001 evidence + API 1.0.1 read; main clean at expected baseline 92bc58b, fetch clean.
+- Next action: implement inventory lib + office-map screen.
+- Review status: pending. P005 commit: none yet.
+---
+
+## 2026-09-24 20:10:00 +05:30 (IST) - P005 S10-A completed (actual, Agent A - OpenCode)
+
+- Office-map screen implemented: inventory lib + map helpers + component + responsive page. 21/21 + 10/10 focused checks (temp harness, fixtures in tests only); 75/75 contract; typecheck/lint(0 errors)/build green; HTTP-200 markup; own server stopped.
+- Real backend :4000 refused (integration pending); browser/keyboard/narrow-screen interaction unverified beyond SSR markup; no screenshots. Auditor-frontend and all backend repos untouched. Review pending; no approval claimed.
+- Next action: commit, push main, verify remote hash; return P005 evidence. Stop after P005.
+- Commit references: P001 pushed; P005 recorded after push.

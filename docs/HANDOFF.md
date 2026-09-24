@@ -19,7 +19,7 @@
   recreates its own effect/request loop, and the initial forced state poll is
   deferred 50 ms for the effect/StrictMode cycle. No second polling loop exists.
 - Final combined gates passed and normal publication completed: backend remote
-  `5cb824d`, frontend remote `bacc8ff`. Read-only public health/runs/export and
+  `5cb824d`, frontend remote `c82e7b9` (implementation merge `bacc8ff`). Read-only public health/runs/export and
   deployed frontend chart/375px checks succeeded; no public mutation was made.
   K003 sections below are preserved historical continuity.
 

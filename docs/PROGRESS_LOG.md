@@ -459,7 +459,7 @@ correction entry; do not rewrite history.
 ## 2026-09-25 03:45:00 +05:30 (IST) — SIM-INTEGRATION publication observed (Kishore | K-A — OpenCode)
 
 - Pushed normally: backend `origin/main=5cb824dc581495a9d1ea9db114cac6823f2e7c1a`;
-  frontend `origin/main=bacc8ff6419db360d9da481048cbe1e482301daf`.
+  frontend `origin/main=c82e7b9` (implementation merge `bacc8ff`).
 - Read-only public checks: backend health 200; runs catalog returned committed
   exportable coverage; one-minute JSON export returned attachment disposition,
   no-store, and allowed `enersave-simulator.vercel.app` origin. The deployed

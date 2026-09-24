@@ -90,5 +90,5 @@ feature work.
 ## exact next action
 
 Final state is published and observed: backend remote `5cb824d`, frontend
-remote `bacc8ff`; public backend health/runs/export and the deployed frontend
+remote `c82e7b9` (implementation merge `bacc8ff`); public backend health/runs/export and the deployed frontend
 chart/375px layout were read-only checked. Do not start K004.

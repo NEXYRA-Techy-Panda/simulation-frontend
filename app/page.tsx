@@ -1,8 +1,8 @@
 import ConnectionPanel from "./components/connection-panel";
 import SimLive from "./components/sim-live";
+import { SIMULATION_BACKEND_URL } from "./lib/deployment-config";
 
-const backendUrl =
-  process.env.NEXT_PUBLIC_SIMULATION_BACKEND_URL ?? "(not configured)";
+const backendUrl = SIMULATION_BACKEND_URL;
 
 export default function Home() {
   return (
@@ -26,7 +26,7 @@ export default function Home() {
             <dl className="mt-2 space-y-1 font-mono text-sm text-zinc-800 dark:text-zinc-200">
               <div className="flex gap-2">
                 <dt className="shrink-0 text-zinc-500 dark:text-zinc-400">
-                  NEXT_PUBLIC_SIMULATION_BACKEND_URL =
+                  Backend API =
                 </dt>
                 <dd className="break-all">{backendUrl}</dd>
               </div>

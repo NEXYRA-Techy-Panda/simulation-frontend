@@ -58,7 +58,7 @@ export default function OfficeMap({
     const origin = sanitizeOrigin(backendUrl);
     if (!origin) {
       setError(
-        "Backend URL is missing or invalid. Set NEXT_PUBLIC_SIMULATION_BACKEND_URL to an http(s) origin.",
+        "Backend API URL is missing or invalid. Verify the deployment configuration.",
       );
       setPhase("error");
       return;

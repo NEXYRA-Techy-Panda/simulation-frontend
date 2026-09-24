@@ -7,7 +7,8 @@ and auditing project.
   `simulation-backend` and renders its authoritative state (5-room map,
   occupant dots, clocks, devices, history, export triggers).
 - **Owner**: Mohan (foundation F0–F6) → Kishore Kumar (after handoff).
-- **Local port (proposed)**: `3000`. Backend: `http://localhost:4000`.
+- **Frontend port**: `3000`. Public backend:
+  `https://git-pipeline.metatronhost.in/sim`.
 - **State at F0 (2026-09-24)**: empty repository — documentation only, no code.
   See `docs/HANDOFF.md` for verified state.
 
@@ -39,7 +40,7 @@ npm run build        # production build
 npm run start        # serve production on http://localhost:3000
 ```
 
-Configuration: copy `.env.example` to `.env` if needed (real `.env` files
-stay ignored). `NEXT_PUBLIC_SIMULATION_BACKEND_URL` holds the backend origin
-only; full contract route paths (e.g. `/api/v1/health`) are used separately.
-No backend requests are made in F2-A; integration belongs to F4.
+Deployment configuration is fixed in
+[`app/lib/deployment-config.ts`](app/lib/deployment-config.ts). The public API
+base includes the required `/sim` path prefix; adapters append contract
+routes such as `/api/v1/health`. No Vercel environment variable is required.

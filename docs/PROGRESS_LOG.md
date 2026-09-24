@@ -140,3 +140,33 @@ correction entry; do not rewrite history.
   establish foundation and v1 data contracts"` + `git push -u origin main`,
   verifying each remote hash. No force-push.
 - Task status set to blocked (commit/push step only); review pending.
+
+---
+
+## 2026-09-24 18:37:52 +05:30 (IST) — F1-R1 started (actual)
+
+- Layer ID: F1-R1 (targeted pre-acceptance corrections). F1 implementation
+  completed; architecture review: changes_requested. This review does not
+  approve the contract and does not authorise F2.
+- Prior publishing resolved: F1 committed + pushed in all five repos with
+  verified remote hashes (see per-repo ACTIVE_TASK commit reference).
+- Objective: (A) self-contained CSV via first-row metadata envelope, drop
+  meta_policy; (B) 12 dp kWh export precision with consistent tolerances +
+  in-memory 7 W rounding check; extend verifier with CSV-alone reconstruction,
+  full semantic parity, and negative checks. Version stays 1.0.0.
+- Startup: no AGENTS.md; all repos on `main`, clean trees at F1 commits;
+  repo-local identity mohan-madhu/mohan326856@gmail.com configured in all
+  five (global untouched).
+- Next action: author correction A in `simulation-backend/contracts/v1/`.
+- Review status: pending. Commit references: F1 pushed (see ACTIVE_TASK).
+
+---
+
+## 2026-09-24 18:43:07 +05:30 (IST) — F1-R1 completed (actual)
+
+- Corrected mirror received and verified 54/54 (all five repos).
+- Continuity updated: ACTIVE_TASK completed, HANDOFF F1-R1 addendum,
+  F1_EVIDENCE F1-R1 section. Review pending; no approval claimed.
+- Next action: commit, push `main`, verify remote hash; return F1-R1 evidence.
+  Do not begin F2.
+- Commit references: F1 pushed; F1-R1 recorded after push.

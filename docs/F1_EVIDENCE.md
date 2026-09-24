@@ -84,3 +84,22 @@ coordinated updates; a newer file alone proves no compatibility.
 
 Authorised by F1 ("docs: establish foundation and v1 data contracts").
 Recorded in the F1 evidence report with verified remote hashes.
+
+---
+
+## F1-R1 corrections (2026-09-24, review pending; version stays 1.0.0)
+
+- (A) CSV is self-contained: `meta_run` envelope on the first data row only,
+  `meta_policy` removed (27-column header), scalar `policy_ref` resolves
+  against the envelope; slice-without-envelope rejected. Fresh-DB import needs
+  no paired JSON.
+- (B) 12 dp kWh exports; unrounded internal accumulation; tolerances 1e-9
+  per-value, n·1e-9 totals, 1e-9 triple-relative; in-memory 7 W × 44,640
+  check (analytic 5.208 kWh vs budget 2.232e-8) passes.
+- Verifier extended: CSV-alone reconstruction + full semantic parity vs the
+  JSON oracle, duplicate handling, 4 negative checks
+  (missing/multiple/unknown-policy/conflicting-room) — all fail as required.
+- Final: 54 passed, 0 failed in all five repos (built-ins only; formal schema
+  validation still F2). Mirror hashes match the regenerated manifest.
+- Repo-local git identity configured (mohan-madhu/mohan326856@gmail.com).
+- Commit/push outcome recorded in the F1-R1 evidence report.

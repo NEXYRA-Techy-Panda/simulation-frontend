@@ -9,6 +9,22 @@
 import Clocks from "./clocks";
 import type { SimState } from "../lib/sim-state";
 
+const integerFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+const energyFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
+
+function formatPower(value: number | undefined): string {
+  return value === undefined ? "—" : `${integerFormatter.format(value)} W`;
+}
+
+function formatEnergy(value: number | undefined): string {
+  return value === undefined ? "—" : `${energyFormatter.format(value)} kWh`;
+}
+
+function shortRunId(value: string | null | undefined): string {
+  if (!value) return "—";
+  return value.length > 24 ? `${value.slice(0, 21)}…` : value;
+}
+
 export default function StatusStrip({
   sim,
   stale,
@@ -31,13 +47,15 @@ export default function StatusStrip({
         </Fact>
         <Fact label="Speed">{sim ? `${sim.speed}×` : "—"}</Fact>
         <Fact label="Office power">
-          {sim?.office ? `${sim.office.power_w} W` : "—"}
+          {formatPower(sim?.office?.power_w)}
         </Fact>
         <Fact label="Cumulative energy">
-          {sim?.office ? `${sim.office.energy_kwh} kWh` : "—"}
+          {formatEnergy(sim?.office?.energy_kwh)}
         </Fact>
         <Fact label="Run">
-          <span className="sim-mono sim-small">{sim?.run_id ?? "—"}</span>
+          <span className="sim-mono sim-small sim-run-value" title={sim?.run_id ?? undefined}>
+            {shortRunId(sim?.run_id)}
+          </span>
         </Fact>
       </dl>
     </section>

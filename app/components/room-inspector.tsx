@@ -25,6 +25,17 @@ import {
 import type { DeviceState } from "../lib/sim-state";
 import type { LiveData } from "./office-floor-plan";
 
+const powerFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+const energyFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
+
+function formatPower(value: number): string {
+  return `${powerFormatter.format(value)} W`;
+}
+
+function formatEnergy(value: number): string {
+  return `${energyFormatter.format(value)} kWh`;
+}
+
 export default function RoomInspector({
   inventory,
   room,
@@ -98,7 +109,7 @@ export default function RoomInspector({
           <dt>Room power</dt>
           <dd>
             {roomLive ? (
-              `${roomLive.power_w} W`
+              formatPower(roomLive.power_w)
             ) : (
               <span className="sim-unknown">unavailable</span>
             )}
@@ -108,7 +119,7 @@ export default function RoomInspector({
           <dt>Room energy</dt>
           <dd>
             {roomLive ? (
-              `${roomLive.energy_kwh} kWh`
+              formatEnergy(roomLive.energy_kwh)
             ) : (
               <span className="sim-unknown">unavailable</span>
             )}
@@ -213,7 +224,7 @@ function DeviceRow({
 
       {runtime ? (
         <p className="sim-mono sim-small">
-          Live: {runtime.power_w} W · {runtime.energy_kwh} kWh cumulative ·{" "}
+          Live: {formatPower(runtime.power_w)} · {formatEnergy(runtime.energy_kwh)} cumulative ·{" "}
           {runtime.on ? "on" : "off"}
           {runtime.override
             ? ` · manual override ${runtime.override.on ? "on" : "off"}`

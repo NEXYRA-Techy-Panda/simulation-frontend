@@ -2170,3 +2170,11 @@ summary:focus-visible {
   background: linear-gradient(90deg, #477fdc, #76a7ff);
   transition: width 180ms ease;
 }
+
+.sim-run-value {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

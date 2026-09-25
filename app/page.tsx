@@ -1,4 +1,5 @@
 import ConnectionPanel from "./components/connection-panel";
+import FastDaysPanel from "./components/fast-days-panel";
 import SimLive from "./components/sim-live";
 import { SIMULATION_BACKEND_URL } from "./lib/deployment-config";
 
@@ -19,6 +20,7 @@ export default function Home() {
         <SimLive backendUrl={backendUrl} />
         <div className="flex min-w-0 flex-col gap-6">
           <ConnectionPanel backendUrl={backendUrl} kind="simulator" />
+          <FastDaysPanel backendUrl={backendUrl} />
           <section className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
             <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Configuration

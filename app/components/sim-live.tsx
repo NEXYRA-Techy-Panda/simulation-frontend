@@ -5,13 +5,17 @@
 // tracking with per-run reset, backoff, manual retry, resume on visibility.
 // Last-known readings are preserved and labelled stale on failure; a network
 // failure is never presented as a stopped simulation.
+//
+// SIM-VIS-01 (Agent M-D — FreeBuff) recomposes the presentation around the
+// dominant office map. The polling, command, stale-state and lifecycle logic
+// below is unchanged; only the JSX layout and the visual components differ.
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Clocks from "./clocks";
 import HistoricalExportPanel from "./historical-export";
 import LifecycleControls, { type PendingOp } from "./lifecycle-controls";
-import OfficeMap, { type OfficeSelection } from "./office-map";
 import LiveCharts from "./charts/live-charts";
+import OfficeMapPanel, { type OfficeSelection } from "./office-map-panel";
+import StatusStrip from "./status-strip";
 import {
   POLL_INTERVAL_MS,
   STATE_TIMEOUT_MS,
@@ -235,8 +239,8 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
     mounted.current = true;
     // Defer past the effect body (same pattern as the other panels).
     const start = setTimeout(() => {
-      void poll(true); // initial fetch after the effect/StrictMode cycle settles
-    }, 50);
+      void poll(true); // initial fetch
+    }, 0);
     const timer = setInterval(() => {
       void poll();
     }, POLL_INTERVAL_MS);
@@ -288,15 +292,46 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
   }, []);
 
   const chartRoom = chartSelection.roomId
-    ? { room_id: chartSelection.roomId, name: chartSelection.roomName ?? chartSelection.roomId }
+    ? {
+        room_id: chartSelection.roomId,
+        name: chartSelection.roomName ?? chartSelection.roomId,
+      }
     : null;
   const chartDevice = chartSelection.deviceId
-    ? { device_id: chartSelection.deviceId, name: chartSelection.deviceName ?? chartSelection.deviceId }
+    ? {
+        device_id: chartSelection.deviceId,
+        name: chartSelection.deviceName ?? chartSelection.deviceId,
+      }
     : null;
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      <Clocks simTimeUtc={sim?.sim_time_utc ?? null} />
+    <div className="sim-live">
+      <StatusStrip sim={sim} stale={stale} />
+
+      {loadError && !sim && (
+        <div className="sim-warn" role="alert">
+          <p>{loadError}</p>
+          <div className="sim-inline">
+            <button
+              type="button"
+              onClick={() => {
+                failCount.current = 0;
+                nextAllowedAt.current = 0;
+                setLoadError(null);
+                void poll(true);
+              }}
+              className="sim-btn sim-btn-primary"
+            >
+              Retry now
+            </button>
+            {lastSuccessIso && (
+              <span className="sim-mono sim-small">
+                last success {new Date(lastSuccessIso).toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       <LifecycleControls
         status={sim?.status ?? null}
@@ -311,71 +346,7 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         onSpeed={(s) => void runCommand("speed", "Speed change", (o) => setSpeed(o, s, fetch))}
       />
 
-      <section
-        aria-label="Office live readings"
-        className="min-w-0 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Office live readings
-          </h2>
-          {stale && (
-            <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              Stale — connection lost
-            </span>
-          )}
-        </div>
-        {sim?.office ? (
-          <dl className="mt-3 space-y-1 font-mono text-sm">
-            <div className="flex gap-2">
-              <dt className="shrink-0 text-zinc-500 dark:text-zinc-400">
-                Current power
-              </dt>
-              <dd className="text-zinc-900 dark:text-zinc-50">
-                {sim.office.power_w} W
-              </dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="shrink-0 text-zinc-500 dark:text-zinc-400">
-                Cumulative energy
-              </dt>
-              <dd className="text-zinc-900 dark:text-zinc-50">
-                {sim.office.energy_kwh} kWh
-              </dd>
-            </div>
-          </dl>
-        ) : (
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            {loadError ??
-              (stale
-                ? "No readings yet and the last check failed — retry when the backend is reachable."
-                : "Waiting for the first backend state…")}
-          </p>
-        )}
-        {(stale || loadError) && (
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                failCount.current = 0;
-                nextAllowedAt.current = 0;
-                setLoadError(null);
-                void poll(true);
-              }}
-              className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-300"
-            >
-              Retry now
-            </button>
-            {lastSuccessIso && (
-              <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
-                last success {new Date(lastSuccessIso).toLocaleString()}
-              </p>
-            )}
-          </div>
-        )}
-      </section>
-
-      <OfficeMap
+      <OfficeMapPanel
         backendUrl={backendUrl}
         live={live}
         mutateDisabled={mutateDisabled}

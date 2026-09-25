@@ -1,5 +1,22 @@
 # HANDOFF — simulation-frontend
 
+## SIM-VIS-01 integration addendum (2026-09-25, Mohan | M-B — Codex / K-A)
+
+- The isolated visual feature branch `mohan/sim-visual-01` at `958c25b` is
+  being integrated onto current main `7220011` in
+  `mohan/sim-visual-integration`; the original worktree and its verified Git
+  bundle remain untouched.
+- The integration keeps the illustrated map/room inspector, status strip,
+  lifecycle controls, technical disclosure, and development-only `/preview`
+  fixtures, while retaining current K003 historical export and SIM-CHART-01
+  live telemetry. Room/device selection feeds the existing chart scope.
+- Current combined checks: 84 tests, typecheck, build and contract 75/75 pass;
+  lint has zero errors and the existing verifier warning. K004-FAST1 remains
+  mounted below the visual live view. Public deployment and browser behavior
+  remain separate evidence.
+- Do not treat mock preview fixtures as backend/runtime evidence. Finish review,
+  push the integration branch, and merge to `main` only after final checks.
+
 ## SIM-INTEGRATION current addendum (2026-09-25, Kishore | K-A — OpenCode)
 
 - Chart branch `9fc0f79` is merged into the K003-preserving main line. K003

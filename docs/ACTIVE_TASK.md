@@ -14,11 +14,27 @@ Kishore | K-A — OpenCode.
 
 ## status
 
-completed — K003 and the chart merge are preserved; review follow-up `a47204d`
-and final docs `53d5bc9` are pushed and observed read-only on the deployed
-frontend. No public mutation was performed.
+in_progress — SIM-VIS-01 visual integration is being merged onto the current
+K003/chart-preserving main line. Review status: pending (never self-approved).
 
-Review status: pending (never self-approved).
+## SIM-VIS-01 integration checkpoint
+
+- Integration branch: `mohan/sim-visual-integration`, based on current main
+  `7220011` and integrating visual commit `958c25b` from
+  `mohan/sim-visual-01`.
+- The illustrated office map, room inspector, original SVG illustrations,
+  status strip, lifecycle controls, technical disclosure and isolated mock
+  preview are being retained.
+- Current K003 historical export and SIM-CHART-01 live telemetry remain mounted;
+  map room/device selection is propagated into the existing chart scope.
+- The visual preview fixtures are development-only and never contact or mutate
+  the simulator backend. The old map component is replaced by the illustrated
+  map panel.
+- Combined checks so far: 84 tests passed, typecheck passed, build passed,
+  contract 75/75 passed, lint has zero errors plus the existing verifier
+  warning. K004-FAST1 `FastDaysPanel` remains mounted below the visual live
+  view. Browser/deployment observation remains separate and unclaimed.
+
 
 ## baseline and preserved work
 
@@ -80,16 +96,17 @@ Review status: pending (never self-approved).
 
 ## files and safety
 
-Expected task-owned additions/changes include chart components, chart buffer and
-tests, `SimLive`/`OfficeMap` integration, package test glob, and continuity/
-evidence docs. No contract, deployment config, environment, backend mutation,
-production database, or public simulator mutation is authorized.
+Expected task-owned additions/changes include the visual illustrations, map and
+room inspector, preview fixtures/tests, merged `SimLive`/chart/export wiring,
+package test glob, and continuity/evidence docs. No contract, deployment config,
+environment, backend mutation, production database, or public simulator
+mutation is authorized.
 
-All integration testing must use a scratch database/task-owned processes. Stop
-after chart integration and K003 publication; do not start K004 or unrelated
-feature work.
+All integration testing must use scratch data/task-owned processes. Finish
+SIM-VIS-01 integration review, push the integration branch, and merge it into
+`main` only after the final verification. Do not start K004 or unrelated work.
 
 ## exact next action
 
-Integration is closed through publication and read-only observation. Do not
-start K004 or unrelated feature work.
+Resolve and verify the visual integration, then publish the integration branch
+and update `main` without touching backend, deployment, or production state.

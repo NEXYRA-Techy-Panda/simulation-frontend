@@ -495,3 +495,18 @@ correction entry; do not rewrite history.
   selection, and true 375px width had no overflow or out-of-viewport buttons.
 - No public lifecycle/device/reset/database mutation was sent. Integration is
   closed under SIM-INTEGRATION; do not start K004.
+
+---
+
+## 2026-09-25 — SIM-VIS-01 integration start (Mohan | M-B — Codex / K-A)
+
+- Created `mohan/sim-visual-integration` from current main `7220011` and began
+  integrating the isolated visual commit `958c25b` without modifying the
+  original `simulation-frontend-visual` worktree or its verified bundle.
+- The visual map, room inspector, illustrations, status strip, lifecycle and
+  technical panel are being composed with the existing K003 export and
+  SIM-CHART-01 telemetry. Room/device selection is wired to chart scope.
+- Combined checks so far: 76 tests passed, typecheck passed, build passed,
+  contract 75/75 passed, and lint has zero errors plus the existing verifier
+  warning. No backend, database, deployment or public simulator mutation was
+  made. Browser/deployment observation remains unclaimed.

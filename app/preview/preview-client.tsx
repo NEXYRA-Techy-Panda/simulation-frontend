@@ -9,8 +9,8 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import OfficeFloorPlan from "../components/office-floor-plan";
 import RoomInspector from "../components/room-inspector";
-import { useMapFullscreen } from "../components/map-fullscreen";
 import StatusStrip from "../components/status-strip";
+import { useMapFullscreen } from "../components/map-fullscreen";
 import { officeHoursSummary } from "../lib/office-map";
 import type { DeviceState, RoomState } from "../lib/sim-state";
 import {
@@ -37,6 +37,7 @@ export default function PreviewClient() {
   const [scenarioOverride, setScenarioOverride] =
     useState<VisualScenario | null>(null);
   const [roomOverride, setRoomOverride] = useState<string | null>(null);
+  const [focusedRoomId, setFocusedRoomId] = useState<string | null>(null);
   const [motionTick, setMotionTick] = useState(0);
   const { fullscreen, toggleFullscreen } = useMapFullscreen();
   const scenario = scenarioOverride ?? initialScenario;
@@ -69,6 +70,11 @@ export default function PreviewClient() {
   const stale = scenario === "stale";
   const room =
     MOCK_INVENTORY.rooms.find((r) => r.room_id === selectedRoomId) ?? null;
+
+  function focusRoom(roomId: string) {
+    setRoomOverride(roomId);
+    setFocusedRoomId(roomId);
+  }
 
   return (
     <div className="sim-shell">
@@ -108,27 +114,27 @@ export default function PreviewClient() {
           <StatusStrip sim={sim} stale={stale} />
 
           <section
-             className={`sim-map-panel ${fullscreen ? "sim-map-panel-fullscreen" : ""}`}
-             aria-label="Office map"
-             role={fullscreen ? "dialog" : undefined}
-             aria-modal={fullscreen ? true : undefined}
-           >
+            className={`sim-map-panel ${fullscreen ? "sim-map-panel-fullscreen" : ""}`}
+            aria-label="Office map"
+            role={fullscreen ? "dialog" : undefined}
+            aria-modal={fullscreen ? true : undefined}
+          >
             <div className="sim-panel-head">
               <h2 className="sim-panel-title">Office map</h2>
               <div className="sim-panel-actions">
-                 <span className="sim-pill">
-                   mock · {SCENARIO_LABEL[scenario]}
-                   {effectiveMotionTick > 0 ? " · moving" : ""}
-                 </span>
-                 <button
-                   type="button"
-                   onClick={toggleFullscreen}
-                   aria-pressed={fullscreen}
-                   className="sim-btn sim-btn-ghost"
-                 >
-                   {fullscreen ? "Exit full screen" : "Full screen map"}
-                 </button>
-               </div>
+                <span className="sim-pill">
+                  mock · {SCENARIO_LABEL[scenario]}
+                  {effectiveMotionTick > 0 ? " · moving" : ""}
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  aria-pressed={fullscreen}
+                  className="sim-btn sim-btn-ghost"
+                >
+                  {fullscreen ? "Exit full screen" : "Full screen map"}
+                </button>
+              </div>
             </div>
             <div className="sim-map-grid">
               <div className="sim-map-main">
@@ -137,23 +143,27 @@ export default function PreviewClient() {
                   live={live}
                   stale={stale}
                   selectedRoomId={selectedRoomId}
-                  onSelectRoom={setRoomOverride}
+                  focusedRoomId={focusedRoomId}
+                  onSelectRoom={focusRoom}
+                  onExitFocus={() => setFocusedRoomId(null)}
                 />
-                <div className="sim-roomlist" role="group" aria-label="Room list">
-                  {MOCK_INVENTORY.rooms.map((r) => (
-                    <button
-                      key={r.room_id}
-                      type="button"
-                      aria-pressed={r.room_id === selectedRoomId}
-                      onClick={() => setRoomOverride(r.room_id)}
-                      className={`sim-chip ${
-                        r.room_id === selectedRoomId ? "sim-chip-active" : ""
-                      }`}
-                    >
-                      {r.name}
-                    </button>
-                  ))}
-                </div>
+                {!focusedRoomId && (
+                  <div className="sim-roomlist" role="group" aria-label="Room list">
+                    {MOCK_INVENTORY.rooms.map((r) => (
+                      <button
+                        key={r.room_id}
+                        type="button"
+                        aria-pressed={r.room_id === selectedRoomId}
+                        onClick={() => focusRoom(r.room_id)}
+                        className={`sim-chip ${
+                          r.room_id === selectedRoomId ? "sim-chip-active" : ""
+                        }`}
+                      >
+                        {r.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="sim-map-side">
                 <RoomInspector
@@ -164,8 +174,9 @@ export default function PreviewClient() {
                   mutateDisabled
                   devicePendingId={null}
                   onDeviceCommand={null}
-                   selectedDeviceId={null}
-                   onSelectDevice={() => undefined}
+                  selectedDeviceId={null}
+                  onSelectDevice={() => undefined}
+                  onFocusRoom={room ? () => focusRoom(room.room_id) : null}
                 />
               </div>
             </div>

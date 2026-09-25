@@ -10,7 +10,7 @@
 // dominant office map. The polling, command, stale-state and lifecycle logic
 // below is unchanged; only the JSX layout and the visual components differ.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import HistoricalExportPanel from "./historical-export";
 import LifecycleControls, { type PendingOp } from "./lifecycle-controls";
 import LiveCharts from "./charts/live-charts";
@@ -38,7 +38,13 @@ import {
 } from "../lib/sim-state";
 import { sanitizeOrigin } from "../lib/health";
 
-export default function SimLive({ backendUrl }: { backendUrl: string }) {
+export default function SimLive({
+  backendUrl,
+  extraControls,
+}: {
+  backendUrl: string;
+  extraControls?: ReactNode;
+}) {
   const [sim, setSim] = useState<SimState | null>(null);
   const [stale, setStale] = useState(false);
   const [lastSuccessIso, setLastSuccessIso] = useState<string | null>(null);
@@ -333,19 +339,6 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         </div>
       )}
 
-      <LifecycleControls
-        status={sim?.status ?? null}
-        speed={speed}
-        pending={pendingOp}
-        disabled={stale}
-        commandError={commandError}
-        onStart={() => void runCommand("start", "Start", (o) => startRun(o, speed, fetch))}
-        onPause={() => void runCommand("pause", "Pause", (o) => pauseRun(o, fetch))}
-        onResume={() => void runCommand("resume", "Resume", (o) => resumeRun(o, fetch))}
-        onReset={() => void runCommand("reset", "Reset", (o) => resetRun(o, fetch))}
-        onSpeed={(s) => void runCommand("speed", "Speed change", (o) => setSpeed(o, s, fetch))}
-      />
-
       <OfficeMapPanel
         backendUrl={backendUrl}
         live={live}
@@ -353,6 +346,21 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         devicePendingId={devicePendingId}
         onDeviceCommand={handleDeviceCommand}
         onSelectionChange={handleSelectionChange}
+        controls={
+          <LifecycleControls
+            status={sim?.status ?? null}
+            speed={speed}
+            pending={pendingOp}
+            disabled={stale}
+            commandError={commandError}
+            onStart={() => void runCommand("start", "Start", (o) => startRun(o, speed, fetch))}
+            onPause={() => void runCommand("pause", "Pause", (o) => pauseRun(o, fetch))}
+            onResume={() => void runCommand("resume", "Resume", (o) => resumeRun(o, fetch))}
+            onReset={() => void runCommand("reset", "Reset", (o) => resetRun(o, fetch))}
+            onSpeed={(s) => void runCommand("speed", "Speed change", (o) => setSpeed(o, s, fetch))}
+          />
+        }
+        extraControls={extraControls}
       />
 
       <LiveCharts

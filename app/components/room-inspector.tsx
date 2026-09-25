@@ -18,6 +18,7 @@ import {
   decorativeUnitCount,
   glyphKindFor,
   groupSummary,
+  isSwitchControllable,
   stateLabel,
   visualStateFor,
 } from "../lib/equipment";
@@ -34,6 +35,7 @@ export default function RoomInspector({
   onDeviceCommand,
   selectedDeviceId,
   onSelectDevice,
+  onFocusRoom,
 }: {
   inventory: Inventory;
   room: Room | null;
@@ -46,6 +48,7 @@ export default function RoomInspector({
     | null;
   selectedDeviceId: string | null;
   onSelectDevice: (deviceId: string | null) => void;
+  onFocusRoom?: (() => void) | null;
 }) {
   if (!room) {
     return (
@@ -67,7 +70,14 @@ export default function RoomInspector({
     <section className="sim-panel" aria-label={`Selected room: ${room.name}`}>
       <div className="sim-panel-head">
         <h2 className="sim-panel-title">{room.name}</h2>
-        <span className="sim-pill">{devices.length} devices</span>
+        <div className="sim-panel-actions">
+          <span className="sim-pill">{devices.length} devices</span>
+          {onFocusRoom && (
+            <button type="button" onClick={onFocusRoom} className="sim-btn sim-btn-ghost">
+              Open room full screen
+            </button>
+          )}
+        </div>
       </div>
 
       <dl className="sim-readings">
@@ -178,9 +188,7 @@ function DeviceRow({
   const policy = policyForDevice(inventory, device.device_id);
   const grace = policy ? graceSeconds(policy.rules) : null;
   const glyph = glyphKindFor(device.device_type);
-  const controllable =
-    device.device_type === "lighting" &&
-    (device.controls ?? []).includes("switch");
+  const controllable = isSwitchControllable(device);
   const units = decorativeUnitCount(device.quantity);
 
   return (

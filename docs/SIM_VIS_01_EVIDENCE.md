@@ -85,6 +85,11 @@ Pure visual checks do not verify backend runtime behavior, real API command path
 - Post-change verification: 85 tests, typecheck, build and contract 75/75 passed;
   lint has 0 errors plus the existing verifier warning. Browser review remains
   with the user.
+- In-map follow-up: room focus/zoom, contained lifecycle/K004 controls,
+  equipment hover readings, and switch controls for all backend-declared switch
+  devices including AC. Voltage/current remain explicitly unavailable because
+  the current state API does not provide them. Final checks: 86 tests,
+  typecheck, build and contract 75/75 passed.
 
 
 The final 375px Chrome capture still shows the preview badge and scenario buttons extending beyond the viewport; the map itself scrolls inside its frame. The shell containment change did not fully resolve this, so narrow-screen layout is not accepted as complete. Fix the preview header/control widths, refresh the 375px capture, and rerun lint/build before requesting K-A integration review. This is the reason the visual takeover remains partial.

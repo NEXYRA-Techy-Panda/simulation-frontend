@@ -523,3 +523,16 @@ correction entry; do not rewrite history.
 - Verification passes 85 tests, typecheck, build and contract 75/75; lint has 0
   errors plus the existing verifier warning. Browser review is left to the user.
   No backend, database, deployment or production mutation was made.
+
+---
+
+## 2026-09-25 — SIM-VIS-01 in-map interaction follow-up (Mohan | M-B — Codex / K-A)
+
+- Added room focus/zoom inside the map, contained lifecycle and K004 controls,
+  equipment hover readings, and on/off/clear controls for every inventory
+  device declaring the backend `switch` capability, including AC.
+- Voltage and current are explicitly unavailable because the current simulator
+  state API reports power/energy but does not provide voltage/current fields.
+- Verification passes 86 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. Browser review remains with the
+  user; no backend, database, deployment or production mutation was made.

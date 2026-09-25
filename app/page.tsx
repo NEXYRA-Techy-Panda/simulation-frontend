@@ -27,8 +27,10 @@ export default function Home() {
       </header>
 
       <main className="sim-main">
-        <SimLive backendUrl={backendUrl} />
-        <FastDaysPanel backendUrl={backendUrl} />
+        <SimLive
+          backendUrl={backendUrl}
+          extraControls={<FastDaysPanel backendUrl={backendUrl} />}
+        />
         <TechnicalPanel backendUrl={backendUrl} />
       </main>
     </div>

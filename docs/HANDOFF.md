@@ -12,6 +12,11 @@
 - Automated verification passes 85 tests, typecheck, build and contract 75/75;
   lint has 0 errors plus the existing verifier warning. Browser review is left
   to the user.
+- The in-map follow-up adds room focus/zoom, contained lifecycle/K004 controls,
+  equipment hover readings, and on/off/clear controls for every inventory device
+  declaring the backend `switch` capability, including AC. Voltage/current are
+  explicitly unavailable because the current state API does not report them.
+  Final checks: 86 tests, typecheck, build and contract 75/75 passed.
 
 
 ## SIM-VIS-01 integration addendum (2026-09-25, Mohan | M-B — Codex / K-A)

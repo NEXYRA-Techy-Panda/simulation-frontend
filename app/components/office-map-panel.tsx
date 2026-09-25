@@ -7,7 +7,7 @@
 // and the selected-room inspector. All functional behaviour of the previous
 // P005 map panel is preserved; only the presentation changed.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   INVENTORY_TIMEOUT_MS,
   fetchInventory,
@@ -42,6 +42,8 @@ export default function OfficeMapPanel({
   devicePendingId = null,
   onDeviceCommand = null,
   onSelectionChange = null,
+  controls = null,
+  extraControls = null,
 }: {
   backendUrl: string;
   live?: LiveData | null;
@@ -51,12 +53,15 @@ export default function OfficeMapPanel({
     | ((deviceId: string, control: "on" | "off" | "clear") => void)
     | null;
   onSelectionChange?: ((selection: OfficeSelection) => void) | null;
+  controls?: ReactNode;
+  extraControls?: ReactNode;
 }) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastSuccessIso, setLastSuccessIso] = useState<string | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [focusedRoomId, setFocusedRoomId] = useState<string | null>(null);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const selectedRoomRef = useRef<string | null>(null);
   const inventoryRef = useRef<Inventory | null>(null);
@@ -65,7 +70,7 @@ export default function OfficeMapPanel({
   const { fullscreen, toggleFullscreen } = useMapFullscreen();
 
   const refresh = useCallback(async () => {
-    if (inFlight.current) return; // never duplicate an outstanding request
+    if (inFlight.current) return;
     const origin = sanitizeOrigin(backendUrl);
     if (!origin) {
       setError(
@@ -78,33 +83,37 @@ export default function OfficeMapPanel({
     inFlight.current = controller;
     if (!inventoryRef.current) setPhase("loading");
     try {
-      const r = await fetchInventory(
+      const result = await fetchInventory(
         origin,
         (url, init) => fetch(url, { ...init, signal: controller.signal }),
         INVENTORY_TIMEOUT_MS,
       );
       if (!mounted.current) return;
-      if (r.ok) {
-        inventoryRef.current = r.inventory;
-        setInventory(r.inventory);
-        setLastSuccessIso(r.fetchedAtIso);
+      if (result.ok) {
+        inventoryRef.current = result.inventory;
+        setInventory(result.inventory);
+        setLastSuccessIso(result.fetchedAtIso);
         setError(null);
         setPhase("loaded");
         const nextRoomId = resolveSelection(
-          r.inventory.rooms.map((room) => room.room_id),
+          result.inventory.rooms.map((room) => room.room_id),
           selectedRoomRef.current,
         );
         selectedRoomRef.current = nextRoomId;
         setSelectedRoomId(nextRoomId);
+        setFocusedRoomId((previous) =>
+          previous && result.inventory.rooms.some((room) => room.room_id === previous)
+            ? previous
+            : null,
+        );
         setSelectedDeviceId((previous) => {
           const device = previous
-            ? r.inventory.devices.find((candidate) => candidate.device_id === previous)
+            ? result.inventory.devices.find((candidate) => candidate.device_id === previous)
             : null;
           return device && device.room_id === nextRoomId ? previous : null;
         });
       } else {
-        // Keep previous data visible but labelled stale; fresh error otherwise.
-        setError(r.error);
+        setError(result.error);
         if (!inventoryRef.current) setPhase("error");
       }
     } finally {
@@ -114,19 +123,19 @@ export default function OfficeMapPanel({
 
   useEffect(() => {
     mounted.current = true;
-    const t = setTimeout(() => {
-      void refresh(); // initial load
+    const timer = setTimeout(() => {
+      void refresh();
     }, 0);
     return () => {
       mounted.current = false;
-      clearTimeout(t);
+      clearTimeout(timer);
       inFlight.current?.abort();
       inFlight.current = null;
     };
   }, [refresh]);
 
   const selectedRoom: Room | null =
-    inventory?.rooms.find((r) => r.room_id === selectedRoomId) ?? null;
+    inventory?.rooms.find((room) => room.room_id === selectedRoomId) ?? null;
   const selectedDevice = selectedDeviceId
     ? inventory?.devices.find((device) => device.device_id === selectedDeviceId) ?? null
     : null;
@@ -137,6 +146,15 @@ export default function OfficeMapPanel({
     selectedRoomRef.current = roomId;
     setSelectedRoomId(roomId);
     setSelectedDeviceId(null);
+  }, []);
+
+  const focusRoom = useCallback((roomId: string) => {
+    selectRoom(roomId);
+    setFocusedRoomId(roomId);
+  }, [selectRoom]);
+
+  const exitFocus = useCallback(() => {
+    setFocusedRoomId(null);
   }, []);
 
   useEffect(() => {
@@ -166,11 +184,22 @@ export default function OfficeMapPanel({
           >
             {fullscreen ? "Exit full screen" : "Full screen map"}
           </button>
-          <button type="button" onClick={() => void refresh()} className="sim-btn sim-btn-ghost">
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            className="sim-btn sim-btn-ghost"
+          >
             Refresh inventory
           </button>
         </div>
       </div>
+
+      {(controls || extraControls) && (
+        <div className="sim-map-controls">
+          {controls}
+          {extraControls}
+        </div>
+      )}
 
       {phase === "loading" && (
         <p className="sim-muted">Loading inventory from the backend…</p>
@@ -209,24 +238,28 @@ export default function OfficeMapPanel({
               live={live}
               stale={stale}
               selectedRoomId={selectedRoomId}
-              onSelectRoom={selectRoom}
+              focusedRoomId={focusedRoomId}
+              onSelectRoom={focusRoom}
+              onExitFocus={exitFocus}
             />
 
-            <div className="sim-roomlist" role="group" aria-label="Room list">
-              {inventory.rooms.map((room) => (
-                <button
-                  key={room.room_id}
-                  type="button"
-                  aria-pressed={room.room_id === selectedRoomId}
-                  onClick={() => selectRoom(room.room_id)}
-                  className={`sim-chip ${
-                    room.room_id === selectedRoomId ? "sim-chip-active" : ""
-                  }`}
-                >
-                  {room.name}
-                </button>
-              ))}
-            </div>
+            {!focusedRoomId && (
+              <div className="sim-roomlist" role="group" aria-label="Room list">
+                {inventory.rooms.map((room) => (
+                  <button
+                    key={room.room_id}
+                    type="button"
+                    aria-pressed={room.room_id === selectedRoomId}
+                    onClick={() => focusRoom(room.room_id)}
+                    className={`sim-chip ${
+                      room.room_id === selectedRoomId ? "sim-chip-active" : ""
+                    }`}
+                  >
+                    {room.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="sim-map-side">
@@ -238,8 +271,9 @@ export default function OfficeMapPanel({
               mutateDisabled={mutateDisabled}
               devicePendingId={devicePendingId}
               onDeviceCommand={onDeviceCommand}
-               selectedDeviceId={selectedDeviceId}
-               onSelectDevice={setSelectedDeviceId}
+              selectedDeviceId={selectedDeviceId}
+              onSelectDevice={setSelectedDeviceId}
+              onFocusRoom={selectedRoom ? () => focusRoom(selectedRoom.room_id) : null}
             />
           </div>
         </div>

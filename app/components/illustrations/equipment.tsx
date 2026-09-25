@@ -38,6 +38,7 @@ export default function EquipmentGlyph({
   flip = false,
   state,
   units = 1,
+  tooltip,
 }: {
   kind: GlyphKind;
   x: number;
@@ -47,6 +48,8 @@ export default function EquipmentGlyph({
   state: GlyphState;
   /** Decorative desk count for a workstation group (drawing only). */
   units?: number;
+  /** Native hover/focus text for the current device reading. */
+  tooltip?: string;
 }) {
   const dash = state.known ? undefined : "4 3";
   const outline = stroke(state);
@@ -55,8 +58,10 @@ export default function EquipmentGlyph({
   return (
     <g
       transform={`translate(${x} ${y}) scale(${flip ? -scale : scale} ${scale})`}
-      aria-hidden="true"
+      aria-hidden={tooltip ? undefined : "true"}
+      aria-label={tooltip}
     >
+      {tooltip && <title>{tooltip}</title>}
       {(kind === "light" || kind === "fan") && (
         <ellipse cx={0} cy={0} rx={22} ry={9} fill="#05070f" opacity={0.28} />
       )}

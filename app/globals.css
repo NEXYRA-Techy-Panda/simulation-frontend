@@ -439,6 +439,16 @@ summary:focus-visible {
 
 /* ------------------------------------------------------------- map layout */
 
+.sim-map-controls {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+.sim-map-controls > .sim-panel {
+  margin: 0;
+}
+
 .sim-map-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -462,6 +472,18 @@ summary:focus-visible {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.sim-map-focus-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--sim-line-soft);
+  color: var(--sim-muted);
+  font-size: 0.78rem;
 }
 
 .sim-map-legend {

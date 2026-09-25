@@ -122,3 +122,15 @@ and update `main` without touching backend, deployment, or production state.
 - Verification after the enhancement: 85 tests, typecheck, build and contract
   75/75 passed; lint has 0 errors plus the existing verifier warning. Browser
   review is intentionally left to the user.
+
+## In-map interaction follow-up
+
+- Room selection now focuses/zooms the selected room inside the map and offers
+  a contained room inspector; lifecycle and K004 controls are rendered inside
+  the map panel rather than as separate map tabs.
+- Equipment hover text exposes backend-reported power/energy readings. Voltage
+  and current remain explicitly unavailable because the current state contract
+  does not provide those fields.
+- Any inventory device declaring the backend `switch` control, including AC,
+  exposes on/off/clear controls. Final checks: 86 tests, typecheck, build and
+  contract 75/75 passed; lint has 0 errors plus the existing verifier warning.

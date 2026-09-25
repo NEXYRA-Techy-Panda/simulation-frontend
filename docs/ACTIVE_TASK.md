@@ -27,9 +27,9 @@ K003/chart-preserving main line. Review status: pending (never self-approved).
   preview are being retained.
 - Current K003 historical export and SIM-CHART-01 live telemetry remain mounted;
   map room/device selection is propagated into the existing chart scope.
-- The visual preview fixtures are development-only and never contact or mutate
-  the simulator backend. The old map component is replaced by the illustrated
-  map panel.
+- The visual preview fixtures are mock-only and never contact or mutate the
+  simulator backend. The route is safe to expose in the deployed frontend for
+  visual review. The old map component is replaced by the illustrated map panel.
 - Combined checks so far: 84 tests passed, typecheck passed, build passed,
   contract 75/75 passed, lint has zero errors plus the existing verifier
   warning. K004-FAST1 `FastDaysPanel` remains mounted below the visual live
@@ -110,3 +110,38 @@ SIM-VIS-01 integration review, push the integration branch, and merge it into
 
 Resolve and verify the visual integration, then publish the integration branch
 and update `main` without touching backend, deployment, or production state.
+
+## Visual enhancement follow-up
+
+- Added a contained **Full screen map** mode with Escape-to-exit, a separate
+  in-map room list, and a non-overlapping room inspector layout.
+- Reduced the status-strip analog/digital clocks for more map space.
+- Added deterministic moving mock occupants to the mock-only `/preview`; live
+  occupancy remains backend-authoritative and is never randomized or mutated in
+  the browser.
+- Verification after the enhancement: 85 tests, typecheck, build and contract
+  75/75 passed; lint has 0 errors plus the existing verifier warning. Browser
+  review is intentionally left to the user.
+
+## In-map interaction follow-up
+
+- Room selection now focuses/zooms the selected room inside the map and offers
+  a contained room inspector; lifecycle and K004 controls are rendered inside
+  the map panel rather than as separate map tabs.
+- Equipment hover text exposes backend-reported power/energy readings. Voltage
+  and current remain explicitly unavailable because the current state contract
+  does not provide those fields.
+- Any inventory device declaring the backend `switch` control, including AC,
+  exposes on/off/clear controls. Final checks: 86 tests, typecheck, build and
+  contract 75/75 passed; lint has 0 errors plus the existing verifier warning.
+
+## Health and deployed preview correction
+
+- The simulator health adapter now unwraps the public `{ data, meta }` response
+  envelope, matching the auditor fix; the valid `/api/v1/health` response is
+  classified as reachable.
+- The clearly labelled mock `/preview` route is now intentionally exposed in
+  production/Vercel. It never calls a backend or submits commands. Deployment
+  propagation is not independently claimed.
+- Final checks after these corrections: 89 tests, typecheck, build and contract
+  75/75 passed; lint has 0 errors plus the existing verifier warning.

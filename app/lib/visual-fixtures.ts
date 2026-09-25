@@ -87,6 +87,56 @@ const NOMINAL: Record<string, number> = Object.fromEntries(
 );
 
 /** Fabricated but internally consistent mock state for the preview only. */
+export function animateMockOccupancy(
+  state: SimState,
+  tick: number,
+): SimState {
+  if (tick <= 0 || state.status !== "running" || state.rooms.length === 0) {
+    return state;
+  }
+
+  const total = state.rooms.reduce((sum, room) => sum + room.occupancy, 0);
+  if (total === 0) return state;
+  const capacities = new Map(
+    MOCK_INVENTORY.rooms.map((room) => [room.room_id, room.capacity]),
+  );
+  const roomOrder = state.rooms.map((_, index) => index);
+  for (let index = roomOrder.length - 1; index > 0; index -= 1) {
+    const swapWith = Math.floor(pseudorandom(tick * 977 + index) * (index + 1));
+    [roomOrder[index], roomOrder[swapWith]] = [roomOrder[swapWith], roomOrder[index]];
+  }
+
+  const counts = state.rooms.map(() => 0);
+  for (let person = 0; person < total; person += 1) {
+    const preferred = roomOrder[(person + tick) % roomOrder.length];
+    const roomId = state.rooms[preferred]?.room_id;
+    const capacity = roomId ? capacities.get(roomId) ?? 0 : 0;
+    if (counts[preferred] < capacity) {
+      counts[preferred] += 1;
+      continue;
+    }
+    const fallback = roomOrder.find(
+      (index) => counts[index] < (capacities.get(state.rooms[index].room_id) ?? 0),
+    );
+    if (fallback !== undefined) counts[fallback] += 1;
+  }
+
+  return {
+    ...state,
+    rooms: state.rooms.map((room, index) => ({
+      ...room,
+      occupancy: counts[index],
+    })),
+  };
+}
+
+function pseudorandom(seed: number): number {
+  let value = (seed + 0x6d2b79f5) | 0;
+  value = Math.imul(value ^ (value >>> 15), value | 1);
+  value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+  return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+}
+
 export function scenarioState(scenario: VisualScenario): SimState | null {
   if (scenario === "unavailable") {
     return null;

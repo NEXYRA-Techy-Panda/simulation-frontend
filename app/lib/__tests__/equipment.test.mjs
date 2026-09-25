@@ -7,6 +7,7 @@ import {
   decorativeUnitCount,
   glyphKindFor,
   groupSummary,
+  isSwitchControllable,
   partitionPlaceable,
   stateLabel,
   visualStateFor,
@@ -80,6 +81,14 @@ describe("visualStateFor / stateLabel", () => {
     const state = visualStateFor(undefined, true);
     assert.equal(state.known, false);
     assert.equal(state.alwaysOn, true);
+  });
+});
+
+describe("switch controls", () => {
+  it("allows AC and other backend-declared switch devices", () => {
+    assert.equal(isSwitchControllable({ controls: ["switch"] }), true);
+    assert.equal(isSwitchControllable({ controls: [] }), false);
+    assert.equal(isSwitchControllable({}), false);
   });
 });
 

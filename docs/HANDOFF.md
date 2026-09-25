@@ -1,5 +1,28 @@
 # HANDOFF — simulation-frontend
 
+## SIM-VIS-01 visual enhancement follow-up (2026-09-25)
+
+- The integrated map now has a contained fullscreen mode with Escape-to-exit;
+  the room list and inspector remain in the layout instead of overlaying the
+  plan.
+- Status-strip analog and digital clocks are smaller to return space to the map.
+- The isolated preview redistributes mock occupants between rooms every few
+  seconds and labels the state as moving. Live occupancy remains exactly what
+  the backend reports; no browser randomization or mutation is used in the game.
+- Automated verification passes 85 tests, typecheck, build and contract 75/75;
+  lint has 0 errors plus the existing verifier warning. Browser review is left
+  to the user.
+- The in-map follow-up adds room focus/zoom, contained lifecycle/K004 controls,
+  equipment hover readings, and on/off/clear controls for every inventory device
+  declaring the backend `switch` capability, including AC. Voltage/current are
+  explicitly unavailable because the current state API does not report them.
+  Final checks: 86 tests, typecheck, build and contract 75/75 passed.
+- Health responses now correctly unwrap the public `{ data, meta }` envelope.
+  The mock-only `/preview` route is intentionally available in the deployed
+  frontend for Vercel visual review; it never contacts a backend. Final checks
+  after these corrections: 89 tests, typecheck, build and contract 75/75 passed.
+
+
 ## SIM-VIS-01 integration addendum (2026-09-25, Mohan | M-B — Codex / K-A)
 
 - The isolated visual feature branch `mohan/sim-visual-01` at `958c25b` is
@@ -7,9 +30,9 @@
   `mohan/sim-visual-integration`; the original worktree and its verified Git
   bundle remain untouched.
 - The integration keeps the illustrated map/room inspector, status strip,
-  lifecycle controls, technical disclosure, and development-only `/preview`
-  fixtures, while retaining current K003 historical export and SIM-CHART-01
-  live telemetry. Room/device selection feeds the existing chart scope.
+  lifecycle controls, technical disclosure, and mock-only `/preview` fixtures,
+  while retaining current K003 historical export and SIM-CHART-01 live
+  telemetry. Room/device selection feeds the existing chart scope.
 - Current combined checks: 84 tests, typecheck, build and contract 75/75 pass;
   lint has zero errors and the existing verifier warning. K004-FAST1 remains
   mounted below the visual live view. Public deployment and browser behavior

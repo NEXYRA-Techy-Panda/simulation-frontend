@@ -101,6 +101,12 @@ export function decorativeUnitCount(quantity: number): number {
  * Inventory summary for a device. nominal_power_w is already the whole-group
  * rating, so it is shown as-is and never multiplied by quantity again.
  */
+export function isSwitchControllable(
+  device: Pick<Device, "controls">,
+): boolean {
+  return (device.controls ?? []).includes("switch");
+}
+
 export function groupSummary(device: Device): string {
   if (device.quantity > 1) {
     return `${device.quantity} units · ${device.nominal_power_w} W group total`;

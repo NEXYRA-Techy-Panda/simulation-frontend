@@ -40,16 +40,27 @@ export default function OfficeFloorPlan({
   live,
   stale,
   selectedRoomId,
+  focusedRoomId = null,
   onSelectRoom,
+  onExitFocus,
 }: {
   inventory: Inventory;
   live: LiveData | null;
   stale: boolean;
   selectedRoomId: string | null;
+  focusedRoomId?: string | null;
   onSelectRoom: (roomId: string) => void;
+  onExitFocus?: () => void;
 }) {
   const knownRooms = inventory.rooms.filter((r) => ROOM_GEOMETRY[r.room_id]);
   const unknownRooms = inventory.rooms.filter((r) => !ROOM_GEOMETRY[r.room_id]);
+  const focusGeometry = focusedRoomId ? ROOM_GEOMETRY[focusedRoomId] : null;
+  const visibleRooms = focusedRoomId
+    ? knownRooms.filter((room) => room.room_id === focusedRoomId)
+    : knownRooms;
+  const mapViewBox = focusGeometry
+    ? `${focusGeometry.x - 28} ${focusGeometry.y - 28} ${focusGeometry.w + 56} ${focusGeometry.h + 56}`
+    : `0 0 ${PLAN_WIDTH} ${PLAN_HEIGHT}`;
 
   const onRoomKey = (e: KeyboardEvent, roomId: string) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -61,13 +72,17 @@ export default function OfficeFloorPlan({
   return (
     <div className="sim-map-frame">
       <svg
-        viewBox={`0 0 ${PLAN_WIDTH} ${PLAN_HEIGHT}`}
+        viewBox={mapViewBox}
         role="group"
-        aria-label="Top-down illustrated office floor plan. Rooms are also selectable from the room list below the map."
-        className="sim-map-svg"
+        aria-label={
+          focusedRoomId
+            ? `Focused illustrated view of ${knownRooms.find((room) => room.room_id === focusedRoomId)?.name ?? "selected room"}.`
+            : "Top-down illustrated office floor plan. Rooms are also selectable from the room list below the map."
+        }
+        className={`sim-map-svg ${focusedRoomId ? "sim-map-svg-focused" : ""}`}
       >
         <BuildingShell />
-        {knownRooms.map((room) => (
+        {visibleRooms.map((room) => (
           <RoomLayer
             key={room.room_id}
             room={room}
@@ -80,6 +95,17 @@ export default function OfficeFloorPlan({
           />
         ))}
       </svg>
+
+      {focusedRoomId && (
+        <div className="sim-map-focus-bar">
+          <span>Room focus: {knownRooms.find((room) => room.room_id === focusedRoomId)?.name ?? "selected room"}</span>
+          {onExitFocus && (
+            <button type="button" className="sim-btn sim-btn-ghost" onClick={onExitFocus}>
+              Show all rooms
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="sim-map-legend" aria-label="Map legend">
         <LegendSwatch className="sim-chip-present" label="People reported" />
@@ -113,6 +139,17 @@ function LegendSwatch({
       {label}
     </span>
   );
+}
+
+function deviceTooltip(
+  device: Inventory["devices"][number],
+  runtime: DeviceState | null,
+): string {
+  if (!runtime) {
+    return `${device.name} · state unavailable · live power unavailable · voltage/current unavailable from the state API`;
+  }
+  const mode = runtime.on ? "on" : "off";
+  return `${device.name} · ${mode} · ${runtime.power_w} W · ${runtime.energy_kwh} kWh · voltage/current unavailable from the state API`;
 }
 
 function RoomLayer({
@@ -172,6 +209,7 @@ function RoomLayer({
             flip={at.flip}
             state={state}
             units={decorativeUnitCount(device.quantity)}
+            tooltip={deviceTooltip(device, runtime)}
           />
         );
       })}
@@ -189,6 +227,7 @@ function RoomLayer({
             scale={0.62}
             state={state}
             units={decorativeUnitCount(device.quantity)}
+            tooltip={deviceTooltip(device, runtime)}
           />
         );
       })}

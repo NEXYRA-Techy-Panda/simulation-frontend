@@ -511,3 +511,41 @@ correction entry; do not rewrite history.
   warning. K004-FAST1 remains mounted below the visual live view. No backend,
   database, deployment or public simulator mutation was made. Browser/
   deployment observation remains unclaimed.
+
+---
+
+## 2026-09-25 — SIM-VIS-01 visual enhancement follow-up (Mohan | M-B — Codex / K-A)
+
+- Added a contained fullscreen map mode with Escape-to-exit, compact analog and
+  digital status clocks, and a non-overlapping room inspector layout.
+- Added deterministic mock-only occupant redistribution to `/preview`; live
+  occupancy remains backend-authoritative and is never randomized in the game.
+- Verification passes 85 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. Browser review is left to the user.
+  No backend, database, deployment or production mutation was made.
+
+---
+
+## 2026-09-25 — SIM-VIS-01 in-map interaction follow-up (Mohan | M-B — Codex / K-A)
+
+- Added room focus/zoom inside the map, contained lifecycle and K004 controls,
+  equipment hover readings, and on/off/clear controls for every inventory
+  device declaring the backend `switch` capability, including AC.
+- Voltage and current are explicitly unavailable because the current simulator
+  state API reports power/energy but does not provide voltage/current fields.
+- Verification passes 86 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. Browser review remains with the
+  user; no backend, database, deployment or production mutation was made.
+
+---
+
+## 2026-09-25 — Simulator health and Vercel preview correction (Mohan | M-B — Codex / K-A)
+
+- Fixed simulator health parsing for the public `{ data, meta }` envelope;
+  valid health responses now classify as reachable instead of unexpected.
+- Enabled the clearly labelled mock-only `/preview` route in production builds
+  so Vercel can serve visual review. The route never contacts a backend or
+  submits commands; deployment propagation is not independently claimed.
+- Final checks pass 89 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. No backend, database, deployment
+  or production mutation was made.

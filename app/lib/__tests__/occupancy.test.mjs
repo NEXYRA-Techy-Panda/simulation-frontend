@@ -8,7 +8,7 @@ import {
   occupantSlots,
   occupancyView,
 } from "../occupancy.ts";
-import { scenarioState } from "../visual-fixtures.ts";
+import { animateMockOccupancy, scenarioState } from "../visual-fixtures.ts";
 
 const BOX = { x: 20, y: 350, w: 620, h: 320 };
 
@@ -100,6 +100,18 @@ describe("visual preview fixtures", () => {
     assert.ok(state.rooms.every((room) => room.occupancy === 0));
     assert.ok(state.devices.filter((device) => device.device_id.includes("fridge")).every((device) => device.on));
     assert.ok(state.devices.filter((device) => !device.device_id.includes("fridge")).every((device) => !device.on));
+  });
+
+  it("moves preview occupants between rooms without changing device readings", () => {
+    const base = scenarioState("occupied");
+    assert.ok(base);
+    const moved = animateMockOccupancy(base, 1);
+    const totalBefore = base.rooms.reduce((sum, room) => sum + room.occupancy, 0);
+    const totalAfter = moved.rooms.reduce((sum, room) => sum + room.occupancy, 0);
+    assert.equal(totalAfter, totalBefore);
+    assert.notDeepEqual(moved.rooms.map((room) => room.occupancy), base.rooms.map((room) => room.occupancy));
+    assert.deepEqual(moved.devices, base.devices);
+    assert.deepEqual(moved.office, base.office);
   });
 
   it("keeps mock room and office readings equal to their contained devices", () => {

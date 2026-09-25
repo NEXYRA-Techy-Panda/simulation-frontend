@@ -98,6 +98,13 @@ Pure visual checks do not verify backend runtime behavior, real API command path
   response envelope, and `/preview` is now intentionally exposed in production
   as a mock-only route. Final checks: 89 tests, typecheck, build and contract
   75/75 passed. Vercel propagation is not independently claimed.
+- Fullscreen data-workspace follow-up: room focus can return to the full office
+  without leaving fullscreen; the map panel now contains live room and equipment
+  tables, relative room/device power heatmaps, and capability-based On/Off/Clear
+  controls. The mock preview shows switch controls disabled and never submits a
+  command. Voltage/current remain explicitly unavailable. Final checks: 89
+  tests, typecheck, build and contract 75/75 passed; lint has 0 errors plus the
+  existing verifier warning.
 
 
 The final 375px Chrome capture still shows the preview badge and scenario buttons extending beyond the viewport; the map itself scrolls inside its frame. The shell containment change did not fully resolve this, so narrow-screen layout is not accepted as complete. Fix the preview header/control widths, refresh the 375px capture, and rerun lint/build before requesting K-A integration review. This is the reason the visual takeover remains partial.

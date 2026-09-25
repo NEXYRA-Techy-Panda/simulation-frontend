@@ -449,6 +449,196 @@ summary:focus-visible {
   margin: 0;
 }
 
+.sim-map-panel-fullscreen .sim-map-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sim-workbench {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--sim-line);
+  border-radius: var(--sim-radius);
+  background: linear-gradient(180deg, var(--sim-navy-800), var(--sim-navy-900));
+}
+
+.sim-workbench-head,
+.sim-workbench-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.sim-workbench-head h3,
+.sim-workbench-section-head h4 {
+  margin: 0;
+  color: var(--sim-text);
+}
+
+.sim-workbench-section-head h4 {
+  font-size: 0.9rem;
+}
+
+.sim-workbench-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.sim-workbench-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--sim-line-soft);
+  border-radius: 10px;
+  background: rgba(5, 9, 15, 0.35);
+}
+
+.sim-workbench-metric span {
+  color: var(--sim-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sim-workbench-metric strong {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1rem;
+}
+
+.sim-workbench-section {
+  margin-top: 1rem;
+}
+
+.sim-heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.65rem;
+}
+
+.sim-heat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: var(--sim-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sim-heat-cell:hover,
+.sim-heat-cell-selected {
+  border-color: var(--sim-accent);
+  box-shadow: 0 0 0 2px rgba(94, 180, 255, 0.3);
+}
+
+.sim-heat-name {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.sim-heat-cell strong {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.95rem;
+}
+
+.sim-heat-cell small {
+  color: rgba(234, 241, 255, 0.75);
+  font-size: 0.7rem;
+}
+
+.sim-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.65rem;
+  border: 1px solid var(--sim-line-soft);
+  border-radius: 10px;
+}
+
+.sim-data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.76rem;
+}
+
+.sim-data-table th,
+.sim-data-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--sim-line-soft);
+  vertical-align: top;
+}
+
+.sim-data-table th {
+  color: var(--sim-muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.sim-table-link,
+.sim-table-controls button {
+  color: var(--sim-accent);
+  font: inherit;
+}
+
+.sim-table-link {
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sim-table-device {
+  display: block;
+  font-weight: 650;
+}
+
+.sim-table-device + small {
+  color: var(--sim-muted);
+}
+
+.sim-table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.sim-table-controls button {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--sim-line);
+  border-radius: 999px;
+  background: #16243d;
+  cursor: pointer;
+}
+
+.sim-table-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.sim-unavailable {
+  color: var(--sim-warn);
+}
+
+.sim-workbench-note {
+  margin: 0.8rem 0 0;
+  color: var(--sim-muted);
+  font-size: 0.72rem;
+}
+
+.sim-pill-warn {
+  border-color: #8a6321;
+  color: #ffe4b3;
+}
+
 .sim-map-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;

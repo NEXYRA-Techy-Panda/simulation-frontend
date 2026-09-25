@@ -19,6 +19,7 @@ import { sanitizeOrigin } from "../lib/health";
 import type { DeviceState, RoomState } from "../lib/sim-state";
 import OfficeFloorPlan from "./office-floor-plan";
 import RoomInspector from "./room-inspector";
+import InMapWorkbench from "./in-map-workbench";
 import { useMapFullscreen } from "./map-fullscreen";
 
 export interface LiveData {
@@ -67,7 +68,10 @@ export default function OfficeMapPanel({
   const inventoryRef = useRef<Inventory | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const mounted = useRef(true);
-  const { fullscreen, toggleFullscreen, openFullscreen, closeFullscreen } = useMapFullscreen();
+  const clearFocus = useCallback(() => {
+    setFocusedRoomId(null);
+  }, []);
+  const { fullscreen, openFullscreen, closeFullscreen } = useMapFullscreen(clearFocus);
 
   const refresh = useCallback(async () => {
     if (inFlight.current) return;
@@ -154,10 +158,16 @@ export default function OfficeMapPanel({
     openFullscreen();
   }, [openFullscreen, selectRoom]);
 
-  const exitFocus = useCallback(() => {
-    setFocusedRoomId(null);
-    closeFullscreen();
-  }, [closeFullscreen]);
+  const showAllRooms = clearFocus;
+
+  const toggleMapFullscreen = useCallback(() => {
+    if (fullscreen) {
+      clearFocus();
+      closeFullscreen();
+    } else {
+      openFullscreen();
+    }
+  }, [clearFocus, closeFullscreen, fullscreen, openFullscreen]);
 
   useEffect(() => {
     onSelectionChange?.({
@@ -180,7 +190,7 @@ export default function OfficeMapPanel({
         <div className="sim-panel-actions">
           <button
             type="button"
-            onClick={toggleFullscreen}
+            onClick={toggleMapFullscreen}
             aria-pressed={fullscreen}
             className="sim-btn sim-btn-ghost"
           >
@@ -242,7 +252,7 @@ export default function OfficeMapPanel({
               selectedRoomId={selectedRoomId}
               focusedRoomId={focusedRoomId}
               onSelectRoom={focusRoom}
-              onExitFocus={exitFocus}
+              onShowAllRooms={showAllRooms}
             />
 
             {!focusedRoomId && (
@@ -264,21 +274,36 @@ export default function OfficeMapPanel({
             )}
           </div>
 
-          <div className="sim-map-side">
-            <RoomInspector
-              inventory={inventory}
-              room={selectedRoom}
-              live={live}
-              buildingHours={hours}
-              mutateDisabled={mutateDisabled}
-              devicePendingId={devicePendingId}
-              onDeviceCommand={onDeviceCommand}
-              selectedDeviceId={selectedDeviceId}
-              onSelectDevice={setSelectedDeviceId}
-              onFocusRoom={selectedRoom ? () => focusRoom(selectedRoom.room_id) : null}
-            />
-          </div>
+          {!fullscreen && (
+            <div className="sim-map-side">
+              <RoomInspector
+                inventory={inventory}
+                room={selectedRoom}
+                live={live}
+                buildingHours={hours}
+                mutateDisabled={mutateDisabled}
+                devicePendingId={devicePendingId}
+                onDeviceCommand={onDeviceCommand}
+                selectedDeviceId={selectedDeviceId}
+                onSelectDevice={setSelectedDeviceId}
+                onFocusRoom={selectedRoom ? () => focusRoom(selectedRoom.room_id) : null}
+              />
+            </div>
+          )}
         </div>
+      )}
+
+      {inventory && inventory.rooms.length > 0 && (fullscreen || focusedRoomId) && (
+        <InMapWorkbench
+          inventory={inventory}
+          live={live}
+          stale={stale}
+          selectedRoomId={selectedRoomId}
+          onSelectRoom={focusRoom}
+          mutateDisabled={mutateDisabled}
+          devicePendingId={devicePendingId}
+          onDeviceCommand={onDeviceCommand}
+        />
       )}
     </section>
   );

@@ -42,7 +42,7 @@ export default function OfficeFloorPlan({
   selectedRoomId,
   focusedRoomId = null,
   onSelectRoom,
-  onExitFocus,
+  onShowAllRooms,
 }: {
   inventory: Inventory;
   live: LiveData | null;
@@ -50,7 +50,7 @@ export default function OfficeFloorPlan({
   selectedRoomId: string | null;
   focusedRoomId?: string | null;
   onSelectRoom: (roomId: string) => void;
-  onExitFocus?: () => void;
+  onShowAllRooms?: () => void;
 }) {
   const knownRooms = inventory.rooms.filter((r) => ROOM_GEOMETRY[r.room_id]);
   const unknownRooms = inventory.rooms.filter((r) => !ROOM_GEOMETRY[r.room_id]);
@@ -99,9 +99,9 @@ export default function OfficeFloorPlan({
       {focusedRoomId && (
         <div className="sim-map-focus-bar">
           <span>Room focus: {knownRooms.find((room) => room.room_id === focusedRoomId)?.name ?? "selected room"}</span>
-          {onExitFocus && (
-            <button type="button" className="sim-btn sim-btn-ghost" onClick={onExitFocus}>
-              Show all rooms
+          {onShowAllRooms && (
+            <button type="button" className="sim-btn sim-btn-ghost" onClick={onShowAllRooms}>
+              Show full office
             </button>
           )}
         </div>

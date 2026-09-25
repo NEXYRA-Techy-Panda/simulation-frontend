@@ -196,7 +196,7 @@ export default function InMapWorkbench({
         <div className="sim-table-wrap">
           <table className="sim-data-table">
             <thead>
-              <tr><th>Room</th><th>Equipment</th><th>State</th><th>Power</th><th>Energy</th><th>Control</th></tr>
+              <tr><th>Room</th><th>Equipment</th><th>State</th><th>Power</th><th>Energy</th><th>V / A</th><th>Control</th></tr>
             </thead>
             <tbody>
               {inventory.devices.map((device) => {
@@ -210,6 +210,7 @@ export default function InMapWorkbench({
                     <td>{stateLabel(runtime)}</td>
                     <td>{formatPower(runtime?.power_w ?? null)}</td>
                     <td>{formatEnergy(runtime?.energy_kwh ?? null)}</td>
+                    <td className="sim-unavailable">Unavailable</td>
                     <td>
                       {controllable ? (
                         <div className="sim-table-controls">

@@ -67,7 +67,7 @@ export default function OfficeMapPanel({
   const inventoryRef = useRef<Inventory | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const mounted = useRef(true);
-  const { fullscreen, toggleFullscreen } = useMapFullscreen();
+  const { fullscreen, toggleFullscreen, openFullscreen, closeFullscreen } = useMapFullscreen();
 
   const refresh = useCallback(async () => {
     if (inFlight.current) return;
@@ -151,11 +151,13 @@ export default function OfficeMapPanel({
   const focusRoom = useCallback((roomId: string) => {
     selectRoom(roomId);
     setFocusedRoomId(roomId);
-  }, [selectRoom]);
+    openFullscreen();
+  }, [openFullscreen, selectRoom]);
 
   const exitFocus = useCallback(() => {
     setFocusedRoomId(null);
-  }, []);
+    closeFullscreen();
+  }, [closeFullscreen]);
 
   useEffect(() => {
     onSelectionChange?.({

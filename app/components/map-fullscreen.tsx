@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 export function useMapFullscreen(): {
   fullscreen: boolean;
   toggleFullscreen: () => void;
+  openFullscreen: () => void;
+  closeFullscreen: () => void;
 } {
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -26,5 +28,7 @@ export function useMapFullscreen(): {
   return {
     fullscreen,
     toggleFullscreen: () => setFullscreen((value) => !value),
+    openFullscreen: () => setFullscreen(true),
+    closeFullscreen: () => setFullscreen(false),
   };
 }

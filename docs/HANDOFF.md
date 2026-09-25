@@ -17,6 +17,10 @@
   declaring the backend `switch` capability, including AC. Voltage/current are
   explicitly unavailable because the current state API does not report them.
   Final checks: 86 tests, typecheck, build and contract 75/75 passed.
+- Health responses now correctly unwrap the public `{ data, meta }` envelope.
+  The mock-only `/preview` route is intentionally available in the deployed
+  frontend for Vercel visual review; it never contacts a backend. Final checks
+  after these corrections: 89 tests, typecheck, build and contract 75/75 passed.
 
 
 ## SIM-VIS-01 integration addendum (2026-09-25, Mohan | M-B — Codex / K-A)
@@ -26,9 +30,9 @@
   `mohan/sim-visual-integration`; the original worktree and its verified Git
   bundle remain untouched.
 - The integration keeps the illustrated map/room inspector, status strip,
-  lifecycle controls, technical disclosure, and development-only `/preview`
-  fixtures, while retaining current K003 historical export and SIM-CHART-01
-  live telemetry. Room/device selection feeds the existing chart scope.
+  lifecycle controls, technical disclosure, and mock-only `/preview` fixtures,
+  while retaining current K003 historical export and SIM-CHART-01 live
+  telemetry. Room/device selection feeds the existing chart scope.
 - Current combined checks: 84 tests, typecheck, build and contract 75/75 pass;
   lint has zero errors and the existing verifier warning. K004-FAST1 remains
   mounted below the visual live view. Public deployment and browser behavior

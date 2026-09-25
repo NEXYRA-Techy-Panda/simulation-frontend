@@ -39,7 +39,7 @@ export default function PreviewClient() {
   const [roomOverride, setRoomOverride] = useState<string | null>(null);
   const [focusedRoomId, setFocusedRoomId] = useState<string | null>(null);
   const [motionTick, setMotionTick] = useState(0);
-  const { fullscreen, toggleFullscreen } = useMapFullscreen();
+  const { fullscreen, toggleFullscreen, openFullscreen, closeFullscreen } = useMapFullscreen();
   const scenario = scenarioOverride ?? initialScenario;
   const selectedRoomId = roomOverride ?? initialRoom;
 
@@ -74,6 +74,7 @@ export default function PreviewClient() {
   function focusRoom(roomId: string) {
     setRoomOverride(roomId);
     setFocusedRoomId(roomId);
+    openFullscreen();
   }
 
   return (
@@ -145,7 +146,10 @@ export default function PreviewClient() {
                   selectedRoomId={selectedRoomId}
                   focusedRoomId={focusedRoomId}
                   onSelectRoom={focusRoom}
-                  onExitFocus={() => setFocusedRoomId(null)}
+                  onExitFocus={() => {
+                     setFocusedRoomId(null);
+                     closeFullscreen();
+                   }}
                 />
                 {!focusedRoomId && (
                   <div className="sim-roomlist" role="group" aria-label="Room list">

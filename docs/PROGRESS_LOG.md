@@ -536,3 +536,16 @@ correction entry; do not rewrite history.
 - Verification passes 86 tests, typecheck, build and contract 75/75; lint has 0
   errors plus the existing verifier warning. Browser review remains with the
   user; no backend, database, deployment or production mutation was made.
+
+---
+
+## 2026-09-25 — Simulator health and Vercel preview correction (Mohan | M-B — Codex / K-A)
+
+- Fixed simulator health parsing for the public `{ data, meta }` envelope;
+  valid health responses now classify as reachable instead of unexpected.
+- Enabled the clearly labelled mock-only `/preview` route in production builds
+  so Vercel can serve visual review. The route never contacts a backend or
+  submits commands; deployment propagation is not independently claimed.
+- Final checks pass 89 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. No backend, database, deployment
+  or production mutation was made.

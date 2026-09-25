@@ -63,7 +63,9 @@ and real room/device chart selection. It does not add a second polling loop or
 calculate simulator telemetry. Integration evidence is in
 [`docs/SIM_INTEGRATION_EVIDENCE.md`](docs/SIM_INTEGRATION_EVIDENCE.md).
 
-Deployment configuration is fixed in
+Deployment configuration lives in
 [`app/lib/deployment-config.ts`](app/lib/deployment-config.ts). The public API
-base includes the required `/sim` path prefix; adapters append contract
-routes such as `/api/v1/health`. No Vercel environment variable is required.
+base includes the required `/sim` path prefix; adapters append contract routes
+such as `/api/v1/health`. Local development can override the base with the
+origin-only `NEXT_PUBLIC_SIMULATION_BACKEND_URL` value shown in
+[`.env.example`](.env.example).

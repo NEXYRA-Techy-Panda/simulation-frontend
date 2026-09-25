@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Office Simulator",
-  description: "NEXYRA commercial-building energy simulation frontend (foundation).",
+  title: "NEXYRA | Office Energy Simulator",
+  description: "A live operations workspace for synthetic commercial-building energy simulation.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

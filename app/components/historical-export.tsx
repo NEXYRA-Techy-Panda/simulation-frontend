@@ -22,8 +22,7 @@ import {
 
 type CatalogPhase = "loading" | "ready" | "error";
 
-const fieldClass =
-  "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 shadow-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-blue-400 dark:focus:ring-blue-950";
+const fieldClass = "sim-field";
 
 const intervalLabels: Record<ExportIntervalSeconds, string> = {
   60: "1 minute",
@@ -276,17 +275,14 @@ export default function HistoricalExportPanel({
   return (
     <section
       aria-labelledby="historical-export-title"
-      className="min-w-0 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
+      className="sim-panel sim-export-panel"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="sim-panel-head">
         <div>
-          <h2
-            id="historical-export-title"
-            className="text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
-          >
+          <h2 id="historical-export-title" className="sim-panel-title">
             Historical data export
           </h2>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="sim-panel-description">
             Download committed synthetic simulator readings for auditor import.
           </p>
         </div>
@@ -294,40 +290,38 @@ export default function HistoricalExportPanel({
           type="button"
           onClick={() => void refreshRuns()}
           disabled={catalogRefreshing || downloading}
-          className="w-full max-w-full rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-5 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="sim-btn sim-btn-ghost"
         >
           {catalogRefreshing ? "Refreshing…" : "Refresh runs"}
         </button>
       </div>
 
       {catalogPhase === "loading" && (
-        <p role="status" aria-live="polite" className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+        <p role="status" aria-live="polite" className="sim-export-help">
           Loading historical runs…
         </p>
       )}
       {catalogPhase === "error" && (
-        <div role="alert" className="mt-4 rounded-lg bg-red-50 p-4 text-sm dark:bg-red-950">
-          <p className="font-medium text-red-800 dark:text-red-200">Historical runs unavailable</p>
-          <p className="mt-1 text-red-700 dark:text-red-300">{catalogError}</p>
+        <div role="alert" className="sim-error sim-export-error">
+          <p><strong>Historical runs unavailable</strong></p>
+          <p>{catalogError}</p>
         </div>
       )}
       {staleCatalog && (
-        <div role="alert" className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+        <div role="alert" className="sim-warn sim-export-warning">
           Showing the last successful run catalog. Refresh failed: {catalogError}
         </div>
       )}
       {catalogPhase === "ready" && runs?.length === 0 && (
-        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-          No simulation runs are available.
-        </p>
+        <p className="sim-export-help">No simulation runs are available.</p>
       )}
 
       {runs && runs.length > 0 && (
-        <form onSubmit={download} className="mt-5 space-y-5">
-          <fieldset disabled={catalogRefreshing || downloading} className="space-y-5">
+        <form onSubmit={download} className="sim-export-form">
+          <fieldset disabled={catalogRefreshing || downloading} className="sim-export-fieldset">
             <legend className="sr-only">Historical export selection</legend>
             <div>
-              <label htmlFor="export-run" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+              <label htmlFor="export-run" className="sim-label">
                 Historical run
               </label>
               <select
@@ -351,7 +345,7 @@ export default function HistoricalExportPanel({
               </select>
             </div>
 
-            <div id="export-coverage" className="rounded-lg bg-zinc-50 p-3 text-sm leading-6 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+            <div id="export-coverage" className="sim-export-coverage">
               {selectedRun ? (
                 <>
                   <p>
@@ -367,7 +361,7 @@ export default function HistoricalExportPanel({
                     Coverage comes only from persisted committed rows. The active run&apos;s unfinished minute and simulated time after the last committed row are not exported.
                   </p>
                   {!selectedRun.exportable && (
-                    <p className="mt-1 font-medium text-amber-700 dark:text-amber-300">
+                    <p className="sim-export-warning-text">
                       This run cannot be exported: {selectedRun.unavailableReason ?? "backend unavailable"}.
                     </p>
                   )}
@@ -379,7 +373,7 @@ export default function HistoricalExportPanel({
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="export-from" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                <label htmlFor="export-from" className="sim-label">
                   Start (UTC, inclusive)
                 </label>
                 <input
@@ -399,7 +393,7 @@ export default function HistoricalExportPanel({
                 />
               </div>
               <div>
-                <label htmlFor="export-to" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                <label htmlFor="export-to" className="sim-label">
                   End (UTC, exclusive)
                 </label>
                 <input
@@ -419,18 +413,18 @@ export default function HistoricalExportPanel({
                 />
               </div>
             </div>
-            <p id="export-window-help" className="text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+            <p id="export-window-help" className="sim-export-help">
               Inputs are explicitly interpreted as UTC. The end is exclusive. Coarser intervals aggregate committed one-minute readings and do not create finer detail.
             </p>
             {windowError && (
-              <p id="export-window-error" role="alert" className="text-sm text-red-700 dark:text-red-300">
+              <p id="export-window-error" role="alert" className="sim-export-error">
                 {windowError}
               </p>
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="export-format" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                <label htmlFor="export-format" className="sim-label">
                   Format
                 </label>
                 <select
@@ -447,7 +441,7 @@ export default function HistoricalExportPanel({
                 </select>
               </div>
               <div>
-                <label htmlFor="export-interval" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                <label htmlFor="export-interval" className="sim-label">
                   Aggregation interval
                 </label>
                 <select
@@ -470,23 +464,23 @@ export default function HistoricalExportPanel({
             <button
               type="submit"
               disabled={!canDownload}
-              className="rounded-full bg-blue-700 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="sim-btn sim-btn-primary"
             >
               {downloading ? "Preparing download…" : `Download ${format.toUpperCase()}`}
             </button>
             {!hasCoverage && selectedRun && (
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="sim-export-help">
                 This run has no committed readings to export yet.
               </span>
             )}
           </div>
           {downloadStatus && (
-            <p role="status" aria-live="polite" className="break-all text-sm text-green-700 dark:text-green-300">
+            <p role="status" aria-live="polite" className="sim-export-success break-all">
               {downloadStatus}
             </p>
           )}
           {downloadError && (
-            <p role="alert" className="break-words text-sm text-red-700 dark:text-red-300">
+            <p role="alert" className="sim-export-error break-words">
               {downloadError}
             </p>
           )}

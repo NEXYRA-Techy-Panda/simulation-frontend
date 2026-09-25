@@ -71,7 +71,7 @@ export default function EnergyChart({
 
   return (
     <div
-      className={`rounded-xl border border-zinc-200 bg-zinc-950 p-4 text-zinc-100 shadow-sm dark:border-zinc-800 ${className}`}
+      className={`sim-chart-card ${className}`}
     >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">

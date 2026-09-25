@@ -16,11 +16,11 @@ import {
   startAdvance, stopAdvance,
 } from "../lib/fast-days";
 
-const btn = "rounded-full px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
-const primary = "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-300";
-const ghost = "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
-const card = "rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950";
-const label = "text-sm font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400";
+const btn = "sim-fast-btn";
+const primary = "sim-fast-btn sim-fast-btn-primary";
+const ghost = "sim-fast-btn sim-fast-btn-ghost";
+const card = "sim-panel sim-fast-panel";
+const label = "sim-panel-title";
 
 const local = (utc: string | null | undefined): string => {
   if (!utc) return "—";
@@ -118,17 +118,17 @@ export default function FastDaysPanel({ backendUrl, onChanged }: FastDaysPanelPr
   return (
     <section aria-label="Fast days and history generation" className={card}>
       <h2 className={label}>Fast days</h2>
-      {stateError && <p role="alert" className="mt-2 text-sm text-amber-700 dark:text-amber-400">State unavailable: {stateError}</p>}
+      {stateError && <p role="alert" className="sim-inline-warning">State unavailable: {stateError}</p>}
       {unsupported && (
-        <p role="status" className="mt-2 text-sm text-amber-700 dark:text-amber-400">
+        <p role="status" className="sim-inline-warning">
           The connected backend does not report advance support (K004-FAST1 not deployed there). Controls are disabled.
         </p>
       )}
 
       {/* ---------------------------------------------------------- advance this run */}
       <div className="mt-4">
-        <h3 className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Advance this run</h3>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <h3 className="sim-fast-heading">Advance this run</h3>
+        <p className="sim-muted sim-small">
           Moves the current run forward (≈1 simulated day per second). Commands still apply; it pauses when done.
           {" "}Recording: {state?.recording_interval_seconds ? `${state.recording_interval_seconds} s` : "not reported"}.
         </p>
@@ -139,14 +139,14 @@ export default function FastDaysPanel({ backendUrl, onChanged }: FastDaysPanelPr
               {d} {d === 1 ? "day" : "days"}
             </button>
           ))}
-          <label className="flex items-center gap-1 text-sm text-zinc-700 dark:text-zinc-300">
+          <label className="sim-inline-field-label">
             Custom
             <input type="number" inputMode="numeric" min={1} max={MAX_ADVANCE_DAYS} step={1} value={days} disabled={active || pending !== null}
               onChange={(e) => setDays(e.target.value)} aria-invalid={checkedDays === null}
-              className="w-16 rounded border border-zinc-300 px-2 py-1 font-mono dark:border-zinc-700 dark:bg-zinc-900" />
+              className="sim-input sim-number-input" />
           </label>
         </div>
-        {checkedDays === null && <p className="mt-1 text-xs text-red-600">Whole days from 1 to {MAX_ADVANCE_DAYS}.</p>}
+        {checkedDays === null && <p className="sim-inline-error">Whole days from 1 to {MAX_ADVANCE_DAYS}.</p>}
         <div className="mt-3 flex gap-2">
           <button type="button" className={`${btn} ${primary}`} disabled={!canAdvance}
             onClick={() => void run("advance", async (o) => { await startAdvance(o, checkedDays!, fetch); })}>
@@ -158,33 +158,33 @@ export default function FastDaysPanel({ backendUrl, onChanged }: FastDaysPanelPr
           </button>
         </div>
         {state?.status === "running" && !active && (
-          <p className="mt-1 text-xs text-zinc-500">Pause the clock to advance (one runner per run).</p>
+          <p className="sim-inline-warning">Pause the clock to advance (one runner per run).</p>
         )}
         <dl className="mt-3 space-y-1 text-sm">
-          <div className="flex gap-2"><dt className="text-zinc-500">Processed time</dt><dd className="font-mono">{local(state?.sim_time_utc)}</dd></div>
+          <div className="flex gap-2"><dt className="sim-fast-term">Processed time</dt><dd className="font-mono">{local(state?.sim_time_utc)}</dd></div>
           {active && adv?.current && (
             <>
-              <div className="flex gap-2"><dt className="text-zinc-500">Target (not yet reached)</dt><dd className="font-mono">{local(adv.current.target_sim_utc)}</dd></div>
-              <div className="flex gap-2"><dt className="text-zinc-500">Progress</dt>
+              <div className="flex gap-2"><dt className="sim-fast-term">Target (not yet reached)</dt><dd className="font-mono">{local(adv.current.target_sim_utc)}</dd></div>
+              <div className="flex gap-2"><dt className="sim-fast-term">Progress</dt>
                 <dd className="font-mono">{adv.current.processed_steps.toLocaleString()} / {adv.current.expected_steps.toLocaleString()} steps ({pct(adv.current.fraction)})</dd></div>
-              <div className="h-2 w-full overflow-hidden rounded bg-zinc-200 dark:bg-zinc-800" role="progressbar"
+              <div className="sim-progress-track" role="progressbar"
                 aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(adv.current.fraction * 100)}>
-                <div className="h-full bg-zinc-900 dark:bg-zinc-50" style={{ width: pct(adv.current.fraction) }} />
+                <div className="sim-progress-value" style={{ width: pct(adv.current.fraction) }} />
               </div>
             </>
           )}
           {!active && adv?.last && (
-            <div className="flex gap-2"><dt className="text-zinc-500">Last advance</dt>
+            <div className="flex gap-2"><dt className="sim-fast-term">Last advance</dt>
               <dd>{adv.last.outcome} at {local(adv.last.end_sim_utc)} ({pct(adv.last.fraction)} of {adv.last.requested_days} d)</dd></div>
           )}
         </dl>
-        {commandError && <p role="alert" className="mt-2 text-sm text-red-600">{commandError}</p>}
+        {commandError && <p role="alert" className="sim-inline-error">{commandError}</p>}
       </div>
 
       {/* ---------------------------------------------------------- new run recording */}
-      <div className="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <h3 className="text-sm font-medium text-zinc-800 dark:text-zinc-200">New run recording</h3>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Ends the current run and starts a new paused run. An existing run&apos;s interval never changes.</p>
+      <div className="sim-fast-divider mt-6 pt-4">
+        <h3 className="sim-fast-heading">New run recording</h3>
+        <p className="sim-muted sim-small">Ends the current run and starts a new paused run. An existing run&apos;s interval never changes.</p>
         <div className="mt-2 flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Recording interval for a new run">
           {RECORDING_INTERVALS.map((s) => (
             <button key={s} type="button" role="radio" aria-checked={interval === s} className={`${btn} ${interval === s ? primary : ghost}`}
@@ -204,26 +204,26 @@ export default function FastDaysPanel({ backendUrl, onChanged }: FastDaysPanelPr
       </div>
 
       {/* ---------------------------------------------------------- generate history (separate run) */}
-      <div className="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <h3 className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Generate history (separate run)</h3>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+      <div className="sim-fast-divider mt-6 pt-4">
+        <h3 className="sim-fast-heading">Generate history (separate run)</h3>
+        <p className="sim-muted sim-small">
           Builds a calendar month as an independent synthetic run. The current run is not changed or advanced.
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <label className="flex items-center gap-1 text-sm">Month
+          <label className="sim-inline-field-label">Month
             <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} disabled={pending !== null}
-              className="rounded border border-zinc-300 px-2 py-1 font-mono dark:border-zinc-700 dark:bg-zinc-900" />
+              className="sim-input sim-month-input" />
           </label>
-          <label className="flex items-center gap-1 text-sm">Recording
+          <label className="sim-inline-field-label">Recording
             <select value={jobInterval} onChange={(e) => setJobInterval(Number(e.target.value) as RecordingInterval)} disabled={pending !== null}
-              className="rounded border border-zinc-300 px-2 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+              className="sim-select">
               <option value={3600}>Hourly</option>
               <option value={60}>Per minute</option>
             </select>
           </label>
-          <label className="flex items-center gap-1 text-sm">Seed
+          <label className="sim-inline-field-label">Seed
             <input value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="auto" inputMode="numeric" disabled={pending !== null}
-              className="w-28 rounded border border-zinc-300 px-2 py-1 font-mono dark:border-zinc-700 dark:bg-zinc-900" />
+              className="sim-input sim-seed-input" />
           </label>
           <button type="button" className={`${btn} ${primary}`} disabled={pending !== null || (job !== null && !isTerminal(job))}
             onClick={() => {
@@ -234,18 +234,18 @@ export default function FastDaysPanel({ backendUrl, onChanged }: FastDaysPanelPr
             {pending === "job" ? "Submitting…" : "Generate"}
           </button>
         </div>
-        {jobError && <p role="alert" className="mt-2 text-sm text-red-600">{jobError}</p>}
+        {jobError && <p role="alert" className="sim-inline-error">{jobError}</p>}
         {job && (
           <dl className="mt-3 space-y-1 text-sm">
-            <div className="flex gap-2"><dt className="text-zinc-500">Job</dt><dd className="font-mono">{job.status}</dd></div>
-            <div className="flex gap-2"><dt className="text-zinc-500">Committed</dt>
+            <div className="flex gap-2"><dt className="sim-fast-term">Job</dt><dd className="font-mono">{job.status}</dd></div>
+            <div className="flex gap-2"><dt className="sim-fast-term">Committed</dt>
               <dd className="font-mono">{job.completed_intervals.toLocaleString()} / {job.expected_intervals.toLocaleString()} intervals
                 {job.committed_through_utc ? ` (through ${local(job.committed_through_utc)})` : ""}</dd></div>
             {job.status === "succeeded" && job.complete && (
-              <div className="flex gap-2"><dt className="text-zinc-500">Generated run</dt><dd className="break-all font-mono">{job.result_ref}</dd></div>
+              <div className="flex gap-2"><dt className="sim-fast-term">Generated run</dt><dd className="break-all font-mono">{job.result_ref}</dd></div>
             )}
             {job.status === "failed" && (
-              <div className="flex gap-2"><dt className="text-zinc-500">Incomplete</dt>
+              <div className="flex gap-2"><dt className="sim-fast-term">Incomplete</dt>
                 <dd>{job.failure?.code}: {job.failure?.message} — partial data is not a complete month.</dd></div>
             )}
           </dl>

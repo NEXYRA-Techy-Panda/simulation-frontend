@@ -120,20 +120,16 @@ export default function LiveCharts({
     return (
       <section
         aria-label="Simulation live telemetry graphs"
-        className={`rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 ${className}`}
+        className={`sim-panel sim-telemetry-panel ${className}`}
       >
-        <div className="flex items-center justify-between border-b border-zinc-200 pb-3 dark:border-zinc-800">
+        <div className="sim-panel-head">
           <div>
-            <h2 className="text-sm font-semibold tracking-wide text-zinc-900 uppercase dark:text-zinc-50">
-              Live Energy Telemetry
-            </h2>
-            <p className="text-xs text-zinc-400">
+            <h2 className="sim-panel-title">Live energy telemetry</h2>
+            <p className="sim-panel-description">
               Real-time scrolling power and cumulative energy trend lines
             </p>
           </div>
-          <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-400 dark:bg-zinc-900">
-            Standby
-          </span>
+          <span className="sim-pill">Standby</span>
         </div>
         <div className="flex h-36 flex-col items-center justify-center text-center text-sm text-zinc-400">
           <p>No active simulation run detected.</p>
@@ -147,32 +143,26 @@ export default function LiveCharts({
 
   return (
     <section
-      className={`rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-6 ${className}`}
+      className={`sim-panel sim-telemetry-panel ${className}`}
       aria-label="Simulation live telemetry graphs"
     >
       {/* Scope and Mode Controls */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-200 pb-4 dark:border-zinc-800">
+      <div className="sim-panel-head sim-telemetry-head">
         <div>
-          <h2 className="text-sm font-semibold tracking-wide text-zinc-900 uppercase dark:text-zinc-50">
-            Live Energy Telemetry
-          </h2>
-          <p className="text-xs text-zinc-400">
+          <h2 className="sim-panel-title">Live energy telemetry</h2>
+          <p className="sim-panel-description">
             Continuous scrolling telemetry — {targetName}
           </p>
         </div>
 
         {/* Scope Selector Tabs */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900 text-xs">
+        <div className="sim-telemetry-actions">
+          <div className="sim-segmented" role="group" aria-label="Telemetry scope">
             <button
               type="button"
               aria-pressed={effectiveScope === "office"}
               onClick={() => setActiveScope("office")}
-              className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                activeScope === "office"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
+              className={`sim-segment ${activeScope === "office" ? "sim-segment-active" : ""}`}
             >
               Office
             </button>
@@ -181,11 +171,7 @@ export default function LiveCharts({
               disabled={!selectedRoom}
               onClick={() => selectedRoom && setActiveScope("room")}
               aria-pressed={activeScope === "room" && Boolean(selectedRoom)}
-              className={`rounded-md px-3 py-1 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                activeScope === "room" && selectedRoom
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
+              className={`sim-segment ${activeScope === "room" && selectedRoom ? "sim-segment-active" : ""}`}
             >
               Room: {selectedRoom?.name ?? "select in map"}
             </button>
@@ -194,27 +180,19 @@ export default function LiveCharts({
               disabled={!selectedDevice}
               onClick={() => selectedDevice && setActiveScope("device")}
               aria-pressed={activeScope === "device" && Boolean(selectedDevice)}
-              className={`rounded-md px-3 py-1 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                activeScope === "device" && selectedDevice
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
+              className={`sim-segment ${activeScope === "device" && selectedDevice ? "sim-segment-active" : ""}`}
             >
               Device: {selectedDevice?.name ?? "select in map"}
             </button>
           </div>
 
           {/* Toggle between Chart View and Accessible Table View */}
-          <div className="inline-flex rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900 text-xs">
+          <div className="sim-segmented" role="group" aria-label="Telemetry display mode">
             <button
               type="button"
               aria-pressed={viewMode === "charts"}
               onClick={() => setViewMode("charts")}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
-                viewMode === "charts"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
+              className={`sim-segment ${viewMode === "charts" ? "sim-segment-active" : ""}`}
             >
               Graphs
             </button>
@@ -222,22 +200,18 @@ export default function LiveCharts({
               type="button"
               aria-pressed={viewMode === "table"}
               onClick={() => setViewMode("table")}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
-                viewMode === "table"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              }`}
+              className={`sim-segment ${viewMode === "table" ? "sim-segment-active" : ""}`}
             >
-              Data Table
+              Data table
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="mt-4">
+      <div className="sim-telemetry-content">
         {viewMode === "charts" ? (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="sim-telemetry-grid">
             <PowerChart
               series={activeSeries}
               scopeName={targetName}

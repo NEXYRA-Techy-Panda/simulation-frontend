@@ -346,26 +346,32 @@ export default function SimLive({ backendUrl }: { backendUrl: string }) {
         onSpeed={(s) => void runCommand("speed", "Speed change", (o) => setSpeed(o, s, fetch))}
       />
 
-      <OfficeMapPanel
-        backendUrl={backendUrl}
-        live={live}
-        mutateDisabled={mutateDisabled}
-        devicePendingId={devicePendingId}
-        onDeviceCommand={handleDeviceCommand}
-        onSelectionChange={handleSelectionChange}
-      />
+      <div className="sim-anchor" id="live-map">
+        <OfficeMapPanel
+          backendUrl={backendUrl}
+          live={live}
+          mutateDisabled={mutateDisabled}
+          devicePendingId={devicePendingId}
+          onDeviceCommand={handleDeviceCommand}
+          onSelectionChange={handleSelectionChange}
+        />
+      </div>
 
-      <LiveCharts
-        state={sim}
-        isStale={stale}
-        selectedRoom={chartRoom}
-        selectedDevice={chartDevice}
-      />
+      <div className="sim-anchor" id="telemetry">
+        <LiveCharts
+          state={sim}
+          isStale={stale}
+          selectedRoom={chartRoom}
+          selectedDevice={chartDevice}
+        />
+      </div>
 
-      <HistoricalExportPanel
-        backendUrl={backendUrl}
-        currentRunId={sim?.run_id ?? null}
-      />
+      <div className="sim-anchor" id="historical-export">
+        <HistoricalExportPanel
+          backendUrl={backendUrl}
+          currentRunId={sim?.run_id ?? null}
+        />
+      </div>
     </div>
   );
 }

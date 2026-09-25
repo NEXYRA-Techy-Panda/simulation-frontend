@@ -1,5 +1,19 @@
 # HANDOFF — simulation-frontend
 
+## SIM-VIS-01 visual enhancement follow-up (2026-09-25)
+
+- The integrated map now has a contained fullscreen mode with Escape-to-exit;
+  the room list and inspector remain in the layout instead of overlaying the
+  plan.
+- Status-strip analog and digital clocks are smaller to return space to the map.
+- The isolated preview redistributes mock occupants between rooms every few
+  seconds and labels the state as moving. Live occupancy remains exactly what
+  the backend reports; no browser randomization or mutation is used in the game.
+- Automated verification passes 85 tests, typecheck, build and contract 75/75;
+  lint has 0 errors plus the existing verifier warning. Browser review is left
+  to the user.
+
+
 ## SIM-VIS-01 integration addendum (2026-09-25, Mohan | M-B — Codex / K-A)
 
 - The isolated visual feature branch `mohan/sim-visual-01` at `958c25b` is

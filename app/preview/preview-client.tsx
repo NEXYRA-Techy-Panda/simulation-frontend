@@ -6,15 +6,17 @@
 // for visual review and screenshots. This route is reachable only in a
 // non-production build (see page.tsx) and never contacts any backend.
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import OfficeFloorPlan from "../components/office-floor-plan";
 import RoomInspector from "../components/room-inspector";
+import { useMapFullscreen } from "../components/map-fullscreen";
 import StatusStrip from "../components/status-strip";
 import { officeHoursSummary } from "../lib/office-map";
 import type { DeviceState, RoomState } from "../lib/sim-state";
 import {
   MOCK_INVENTORY,
   SCENARIO_LABEL,
+  animateMockOccupancy,
   scenarioState,
   type VisualScenario,
 } from "../lib/visual-fixtures";
@@ -35,10 +37,25 @@ export default function PreviewClient() {
   const [scenarioOverride, setScenarioOverride] =
     useState<VisualScenario | null>(null);
   const [roomOverride, setRoomOverride] = useState<string | null>(null);
+  const [motionTick, setMotionTick] = useState(0);
+  const { fullscreen, toggleFullscreen } = useMapFullscreen();
   const scenario = scenarioOverride ?? initialScenario;
   const selectedRoomId = roomOverride ?? initialRoom;
 
-  const sim = scenarioState(scenario);
+  useEffect(() => {
+    if (scenario !== "occupied") return;
+    const timer = window.setInterval(() => {
+      setMotionTick((value) => value + 1);
+    }, 3800);
+    return () => window.clearInterval(timer);
+  }, [scenario]);
+
+  const baseSim = useMemo(() => scenarioState(scenario), [scenario]);
+  const effectiveMotionTick = scenario === "occupied" ? motionTick : 0;
+  const sim = useMemo(
+    () => (baseSim ? animateMockOccupancy(baseSim, effectiveMotionTick) : null),
+    [baseSim, effectiveMotionTick],
+  );
   const live = sim
     ? {
         devices: new Map<string, DeviceState>(
@@ -90,10 +107,28 @@ export default function PreviewClient() {
         <div className="sim-live">
           <StatusStrip sim={sim} stale={stale} />
 
-          <section className="sim-map-panel" aria-label="Office map">
+          <section
+             className={`sim-map-panel ${fullscreen ? "sim-map-panel-fullscreen" : ""}`}
+             aria-label="Office map"
+             role={fullscreen ? "dialog" : undefined}
+             aria-modal={fullscreen ? true : undefined}
+           >
             <div className="sim-panel-head">
               <h2 className="sim-panel-title">Office map</h2>
-              <span className="sim-pill">mock · {SCENARIO_LABEL[scenario]}</span>
+              <div className="sim-panel-actions">
+                 <span className="sim-pill">
+                   mock · {SCENARIO_LABEL[scenario]}
+                   {effectiveMotionTick > 0 ? " · moving" : ""}
+                 </span>
+                 <button
+                   type="button"
+                   onClick={toggleFullscreen}
+                   aria-pressed={fullscreen}
+                   className="sim-btn sim-btn-ghost"
+                 >
+                   {fullscreen ? "Exit full screen" : "Full screen map"}
+                 </button>
+               </div>
             </div>
             <div className="sim-map-grid">
               <div className="sim-map-main">

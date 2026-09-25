@@ -19,6 +19,7 @@ import { sanitizeOrigin } from "../lib/health";
 import type { DeviceState, RoomState } from "../lib/sim-state";
 import OfficeFloorPlan from "./office-floor-plan";
 import RoomInspector from "./room-inspector";
+import { useMapFullscreen } from "./map-fullscreen";
 
 export interface LiveData {
   devices: Map<string, DeviceState>;
@@ -61,6 +62,7 @@ export default function OfficeMapPanel({
   const inventoryRef = useRef<Inventory | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const mounted = useRef(true);
+  const { fullscreen, toggleFullscreen } = useMapFullscreen();
 
   const refresh = useCallback(async () => {
     if (inFlight.current) return; // never duplicate an outstanding request
@@ -147,12 +149,27 @@ export default function OfficeMapPanel({
   }, [onSelectionChange, selectedDevice, selectedRoom]);
 
   return (
-    <section className="sim-map-panel" aria-label="Office map">
+    <section
+      className={`sim-map-panel ${fullscreen ? "sim-map-panel-fullscreen" : ""}`}
+      aria-label="Office map"
+      role={fullscreen ? "dialog" : undefined}
+      aria-modal={fullscreen ? true : undefined}
+    >
       <div className="sim-panel-head">
         <h2 className="sim-panel-title">Office map</h2>
-        <button type="button" onClick={() => void refresh()} className="sim-btn sim-btn-ghost">
-          Refresh inventory
-        </button>
+        <div className="sim-panel-actions">
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            aria-pressed={fullscreen}
+            className="sim-btn sim-btn-ghost"
+          >
+            {fullscreen ? "Exit full screen" : "Full screen map"}
+          </button>
+          <button type="button" onClick={() => void refresh()} className="sim-btn sim-btn-ghost">
+            Refresh inventory
+          </button>
+        </div>
       </div>
 
       {phase === "loading" && (

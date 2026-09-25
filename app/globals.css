@@ -122,14 +122,18 @@ body {
 
 .sim-strip {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  grid-template-columns: minmax(190px, 220px) minmax(0, 1fr);
   gap: 1rem;
   align-items: center;
-  padding: 0.85rem 1.1rem;
+  padding: 0.6rem 0.85rem;
   border: 1px solid var(--sim-line);
   border-radius: var(--sim-radius);
   background: linear-gradient(180deg, var(--sim-navy-700), var(--sim-navy-800));
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.sim-strip-clock {
+  min-width: 0;
 }
 
 .sim-strip-facts {
@@ -200,14 +204,14 @@ body {
 }
 
 .sim-clocks-strip .sim-clock-face {
-  width: 84px;
-  height: 84px;
+  width: 60px;
+  height: 60px;
   flex: none;
 }
 
 .sim-clock-digital {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.2rem;
   font-weight: 750;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
@@ -216,7 +220,7 @@ body {
 
 .sim-clock-date {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   color: var(--sim-muted);
 }
 
@@ -226,6 +230,10 @@ body {
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.68rem;
   color: #7f93b8;
+}
+
+.sim-clocks-strip .sim-clock-backend {
+  display: none;
 }
 
 .sim-clock-idle {
@@ -250,6 +258,41 @@ body {
   background: linear-gradient(180deg, var(--sim-navy-800), var(--sim-navy-900));
 }
 
+.sim-map-panel-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  overflow: auto;
+  border-radius: 0;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: var(--sim-navy-950);
+}
+
+.sim-map-panel-fullscreen .sim-map-grid {
+  min-height: calc(100vh - 5.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  align-items: stretch;
+}
+
+.sim-map-panel-fullscreen .sim-map-frame {
+  min-height: 0;
+  height: calc(100vh - 12rem);
+}
+
+.sim-map-panel-fullscreen .sim-map-svg {
+  width: 100%;
+  min-width: 900px;
+}
+
+.sim-map-panel-fullscreen .sim-map-side {
+  min-height: 0;
+  max-height: calc(100vh - 8rem);
+  overflow: auto;
+}
+
 .sim-panel-head {
   display: flex;
   flex-wrap: wrap;
@@ -257,6 +300,15 @@ body {
   justify-content: space-between;
   gap: 0.6rem;
   margin-bottom: 0.7rem;
+}
+
+.sim-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  min-width: 0;
 }
 
 .sim-panel-title {
@@ -774,6 +826,19 @@ select:focus-visible {
 @media (max-width: 1100px) {
   .sim-map-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sim-map-panel-fullscreen .sim-map-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sim-map-panel-fullscreen .sim-map-frame {
+    height: auto;
+    min-height: 28rem;
+  }
+
+  .sim-map-panel-fullscreen .sim-map-side {
+    max-height: none;
   }
 }
 

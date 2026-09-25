@@ -76,5 +76,15 @@ Pure visual checks do not verify backend runtime behavior, real API command path
   K004-FAST1 remains mounted below the visual live view. Browser/deployment
   observation is not claimed.
 
+## Visual enhancement follow-up
+
+- Added a contained fullscreen map mode with Escape-to-exit and a separate room
+  inspector layout; controls no longer overlay the plan.
+- Reduced the analog/digital status clocks and added deterministic mock-only
+  occupant redistribution to `/preview`. Live occupancy remains backend-driven.
+- Post-change verification: 85 tests, typecheck, build and contract 75/75 passed;
+  lint has 0 errors plus the existing verifier warning. Browser review remains
+  with the user.
+
 
 The final 375px Chrome capture still shows the preview badge and scenario buttons extending beyond the viewport; the map itself scrolls inside its frame. The shell containment change did not fully resolve this, so narrow-screen layout is not accepted as complete. Fix the preview header/control widths, refresh the 375px capture, and rerun lint/build before requesting K-A integration review. This is the reason the visual takeover remains partial.

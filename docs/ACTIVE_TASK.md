@@ -110,3 +110,15 @@ SIM-VIS-01 integration review, push the integration branch, and merge it into
 
 Resolve and verify the visual integration, then publish the integration branch
 and update `main` without touching backend, deployment, or production state.
+
+## Visual enhancement follow-up
+
+- Added a contained **Full screen map** mode with Escape-to-exit, a separate
+  in-map room list, and a non-overlapping room inspector layout.
+- Reduced the status-strip analog/digital clocks for more map space.
+- Added deterministic moving mock occupants to the development-only preview;
+  live occupancy remains backend-authoritative and is never randomized or
+  mutated in the browser.
+- Verification after the enhancement: 85 tests, typecheck, build and contract
+  75/75 passed; lint has 0 errors plus the existing verifier warning. Browser
+  review is intentionally left to the user.

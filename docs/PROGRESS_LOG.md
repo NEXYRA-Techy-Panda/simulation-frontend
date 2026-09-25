@@ -511,3 +511,15 @@ correction entry; do not rewrite history.
   warning. K004-FAST1 remains mounted below the visual live view. No backend,
   database, deployment or public simulator mutation was made. Browser/
   deployment observation remains unclaimed.
+
+---
+
+## 2026-09-25 — SIM-VIS-01 visual enhancement follow-up (Mohan | M-B — Codex / K-A)
+
+- Added a contained fullscreen map mode with Escape-to-exit, compact analog and
+  digital status clocks, and a non-overlapping room inspector layout.
+- Added deterministic mock-only occupant redistribution to `/preview`; live
+  occupancy remains backend-authoritative and is never randomized in the game.
+- Verification passes 85 tests, typecheck, build and contract 75/75; lint has 0
+  errors plus the existing verifier warning. Browser review is left to the user.
+  No backend, database, deployment or production mutation was made.
